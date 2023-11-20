@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "603976194765",
+    "project_id": "mondecare-3b42f",
+    "storage_bucket": "mondecare-3b42f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:603976194765:android:e13d1b019fd3117547a784",
+        "android_client_info": {
+          "package_name": "com.example.mondecare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcyD_SFHps4fx3ZJfZPN8OR_tk_nAU_WM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
