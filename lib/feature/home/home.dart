@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:mondecare/config/theme/colors.dart';
+import 'package:mondecare/config/theme/widgets/drawer.dart';
 import 'package:mondecare/config/theme/widgets/text400normal.dart';
 import 'package:mondecare/core/routes/routes.dart';
 
@@ -29,105 +30,28 @@ class _homeState extends State<home> {
           ),
           centerTitle: true,
         ),
-        drawer: Drawer(
-          backgroundColor: darkgrey,
-          child: ListView(physics: const BouncingScrollPhysics(), children: [
-            _drawerhead(context),
-            _drawerlist(size),
-          ]),
+        drawer: drawer(
+          choosed: 1,
         ),
         body: SafeArea(
           child: LayoutBuilder(builder: (context, constraints) {
             return SizedBox(
                 height: constraints.maxHeight,
                 width: constraints.maxWidth,
-                child: Stack(
+                child: Column(
                   children: [
-                    _homelist(),
+                    _homeTitle(size),
+                    Expanded(
+                      child: Stack(
+                        children: [
+                          _homelist(),
+                        ],
+                      ),
+                    ),
                   ],
                 ));
           }),
         ));
-  }
-
-  _drawerlist(Size size) {
-    return Expanded(
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            Container(
-              height: 1,
-              decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(2)),
-                  color: white),
-              margin: EdgeInsets.symmetric(horizontal: size.width * 0.05),
-            ),
-            _drawerlistItem(size, 'Dashboard', 'home', () {}, true),
-            _drawerlistItem(
-                size, 'Search User', 'searchuserwhite', () {}, false),
-            _drawerlistItem(size, 'Add User', 'adduserwhite', () {}, false),
-            _drawerlistItem(size, 'Insights', 'insightswhite', () {}, false),
-            _drawerlistItem(size, 'Admins', 'adminwhite', () {}, false),
-            _drawerlistItem(
-                size, 'Delete User', 'deleteuserwhite', () {}, false),
-            _drawerlistItem(size, 'Logs', 'logswhite', () {}, false),
-          ],
-        ),
-      ),
-    );
-  }
-
-  _drawerlistItem(
-    Size size,
-    String title,
-    String imagePath,
-    Function onClick,
-    bool choosed,
-  ) {
-    return Column(
-      children: [
-        Container(
-          height: 0.5,
-          decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(2)),
-              color: white),
-          margin: EdgeInsets.symmetric(horizontal: size.width * 0.05),
-        ),
-        InkWell(
-          onTap: () {},
-          child: Container(
-            height: size.height * 0.08,
-            padding: const EdgeInsets.all(10),
-            width: double.infinity,
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: SvgPicture.asset(
-                    'assets/images/$imagePath.svg',
-                    height: size.height * 0.03,
-                  ),
-                ),
-                Expanded(
-                    flex: 3,
-                    child: text400normal(
-                      data: title,
-                      fontsize: size.height * 0.017,
-                      align: TextAlign.start,
-                      textColor: white,
-                    )),
-                Expanded(
-                    flex: 1,
-                    child: Visibility(
-                        visible: choosed,
-                        child: SvgPicture.asset('assets/images/choosed.svg')))
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
   }
 
   _homelist() {
@@ -143,9 +67,22 @@ class _homeState extends State<home> {
         _homelistItem(size, 'adduser', 'Add User', addUserRoute),
         _homelistItem(size, 'insights', 'Insights', addUserRoute),
         _homelistItem(size, 'admin', 'Admins', addUserRoute),
-        _homelistItem(size, 'deleteuser', 'Delete User', addUserRoute),
-        _homelistItem(size, 'logs', 'Logs', addUserRoute),
+        _homelistItem(size, 'deleteuser', 'Delete User', deleteUserScreenRoute),
+        _homelistItem(size, 'logs', 'Logs', logsScreenRoute),
       ],
+    );
+  }
+
+  _homeTitle(Size size) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      child: text400normal(
+        data: 'Control Panel',
+        fontsize: size.height * 0.03,
+        fontWeight: FontWeight.w300,
+        align: TextAlign.center,
+        textColor: darkgrey,
+      ),
     );
   }
 
@@ -184,14 +121,6 @@ class _homeState extends State<home> {
           ),
         ),
       ),
-    );
-  }
-
-  _drawerhead(BuildContext context) {
-    return SvgPicture.asset(
-      'assets/images/iconwhite.svg',
-      height: MediaQuery.of(context).size.height * 0.2,
-      width: MediaQuery.of(context).size.height * 0.2,
     );
   }
 

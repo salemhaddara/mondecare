@@ -1,6 +1,7 @@
-// ignore_for_file: camel_case_types
+// ignore_for_file: camel_case_types, must_be_immutable
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 // import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mondecare/config/theme/colors.dart';
@@ -10,13 +11,27 @@ class searchbar extends StatelessWidget {
   final bool? autofocus;
   final Function(String?) onChanged;
   final Function onSearchTapped;
-  const searchbar({
-    Key? key,
-    required this.hint,
-    required this.onChanged,
-    this.autofocus,
-    required this.onSearchTapped,
-  }) : super(key: key);
+  String? imagePath;
+  searchbar(
+      {Key? key,
+      required this.hint,
+      required this.onChanged,
+      this.autofocus,
+      required this.onSearchTapped,
+      this.imagePath})
+      : super(key: key);
+  _image() {
+    if (imagePath == null) {
+      return const Icon(
+        Icons.search,
+        color: Colors.white,
+      );
+    } else {
+      return Container(
+          margin: const EdgeInsets.all(5),
+          child: SvgPicture.asset('assets/images/delete.svg'));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,15 +81,11 @@ class searchbar extends StatelessWidget {
                       borderRadius:
                           const BorderRadius.all(Radius.circular(14))),
                   child: InkWell(
-                    borderRadius: const BorderRadius.all(Radius.circular(14)),
-                    onTap: () {
-                      onSearchTapped();
-                    },
-                    child: const Icon(
-                      Icons.search,
-                      color: Colors.white,
-                    ),
-                  )),
+                      borderRadius: const BorderRadius.all(Radius.circular(14)),
+                      onTap: () {
+                        onSearchTapped();
+                      },
+                      child: _image())),
             ))
       ]),
     );

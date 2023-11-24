@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mondecare/config/Models/Customer.dart';
+import 'package:mondecare/config/Models/logEvent.dart';
 import 'package:mondecare/core/utils/Backend/Backend.dart';
 
 class usercontrolrepository {
@@ -22,11 +23,9 @@ class usercontrolrepository {
           db.collection(Backend.users).doc(value.id).update({
             'CustomerID': value.id,
           }).then((value) async {
-            await db.collection('logs').add({
-              'message':
-                  '${customer.AdminName} Added New Client with Number Of Card : ${customer.CardNumber} ',
-              'date': DateTime.now()
-            });
+            await db.collection('logs').add(logEvent(customer.CardNumber,
+                    customer.AdminName, DateTime.now(), 'add')
+                .toMap());
             onSuccess({
               'success': true,
               'message': 'Customer Registered Successfully'

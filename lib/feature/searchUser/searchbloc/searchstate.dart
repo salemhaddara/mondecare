@@ -1,13 +1,14 @@
 import 'package:mondecare/config/Models/Customer.dart';
+import 'package:mondecare/feature/searchUser/searchbloc/searchStateTracker/searchStatusTracker.dart';
 
 class searchstate {
   Customer? customer;
   String searchedNumber;
-  bool working;
   String message;
+  searchStatusTracker statusTracker;
   searchstate(
       {this.customer,
       this.searchedNumber = '',
-      this.working = false,
-      required this.message});
+      required this.message,
+      required this.statusTracker});
 }

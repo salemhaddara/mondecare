@@ -1,18 +1,10 @@
 // ignore_for_file: must_be_immutable, camel_case_types
-import 'dart:ui';
-import 'package:pdf/widgets.dart' as pw;
+
 import 'package:mondecare/config/Models/Customer.dart';
 
 class pdfConstruction {
   Customer customer;
   pdfConstruction({required this.customer});
-  static pw.Widget build(Size size) {
-    return pw.Container(
-      height: size.height,
-      width: size.width,
-      child: pw.Column(children: []),
-    );
-  }
 
   static const svgPicture =
       '''<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="300" height="300">

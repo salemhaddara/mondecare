@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mondecare/config/Models/Customer.dart';
 import 'package:mondecare/config/theme/colors.dart';
 import 'package:mondecare/config/theme/widgets/Snackbar.dart';
+import 'package:mondecare/config/theme/widgets/drawer.dart';
 import 'package:mondecare/config/theme/widgets/inputfield.dart';
 import 'package:mondecare/config/theme/widgets/phoneinput.dart';
 import 'package:mondecare/config/theme/widgets/text400normal.dart';
@@ -38,6 +39,9 @@ class _addUserScreenState extends State<addUserScreen> {
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
     return Scaffold(
+        drawer: drawer(
+          choosed: 3,
+        ),
         appBar: AppBar(
           backgroundColor: white,
           foregroundColor: darkgrey,
