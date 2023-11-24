@@ -33,7 +33,6 @@ class usercontrolrepository {
           }).catchError((onError) {
             onFailed({'success': false, 'message': onError.toString()});
           });
-
           return true;
         }).catchError((e) {
           onFailed({'success': false, 'message': e.toString()});

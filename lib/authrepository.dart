@@ -90,4 +90,24 @@ class authrepository {
       return false;
     }
   }
+
+  Future<List<MyUser>> getAllUsersFromCustomersCollection() async {
+    List<MyUser> users = List.empty(growable: true);
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection(Backend.users).get();
+
+      users = querySnapshot.docs.map((documentSnapshot) {
+        final userData = documentSnapshot.data() as Map<String, dynamic>;
+        return MyUser(
+          name: userData['name'],
+          id: userData['id'],
+          email: userData['email'],
+        );
+      }).toList();
+    } catch (e) {
+      print('Error fetching users: $e');
+    }
+    return users;
+  }
 }
