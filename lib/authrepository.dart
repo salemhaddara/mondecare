@@ -53,8 +53,6 @@ class AuthRepository {
         final Map<String, dynamic> data = json.decode(response.body);
         print(response.body);
         final List<dynamic> users = data['documents'];
-
-        // Search for the user by email
         for (var user in users) {
           final userEmail = user['fields']['email']['stringValue'];
           print(userEmail);
@@ -99,12 +97,11 @@ class AuthRepository {
         final responseData = json.decode(response.body);
         final userId = responseData['localId'];
 
-        // Example: Add user details to Firestore
         await http.post(
           Uri.parse('$firestoreURL/users'),
           body: json.encode({
             'fields': {
-              'userId': {'stringValue': userId},
+              'id': {'stringValue': userId},
               'name': {'stringValue': name},
               'email': {'stringValue': email},
             },
@@ -124,21 +121,33 @@ class AuthRepository {
   Future<List<MyUser>> getAllUsersFromFirestore() async {
     try {
       final response = await http.get(
-        Uri.parse('$firestoreURL/collectionName.json'),
+        Uri.parse('$firestoreURL/users'),
       );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         final List<MyUser> users = [];
 
-        data.forEach((key, value) {
-          final user = MyUser.fromJson({
-            'name': value['name'],
-            'id': key,
-            'email': value['email'],
-          });
-          users.add(user);
-        });
+        if (data.containsKey('documents')) {
+          final List<dynamic> documents = data['documents'];
+
+          for (final doc in documents) {
+            final fields = doc['fields'] as Map<String, dynamic>?;
+
+            if (fields != null) {
+              final name = fields['name']?['stringValue'] ?? '';
+              final id = fields['id']?['stringValue'] ?? '';
+              final email = fields['email']?['stringValue'] ?? '';
+              print(id);
+              final user = MyUser.fromJson({
+                'name': name,
+                'id': id,
+                'email': email,
+              });
+              users.add(user);
+            }
+          }
+        }
 
         return users;
       } else {

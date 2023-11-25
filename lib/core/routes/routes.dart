@@ -7,3 +7,4 @@ String addUserRoute = '/addUserScreen';
 String searchUserRoute = '/searchUser';
 String logsScreenRoute = '/logsScreen';
 String deleteUserScreenRoute = '/deleteUserScreen';
+String allUsersScreenRoute = '/allAdminsScreen';

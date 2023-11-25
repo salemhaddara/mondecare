@@ -1,9 +1,9 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mondecare/authrepository.dart';
 import 'package:mondecare/core/routes/routes.dart';
 import 'package:mondecare/feature/addUser/addUserScreen.dart';
+import 'package:mondecare/feature/admins/AllUsersScreen.dart';
 import 'package:mondecare/feature/deleteUser/deleteUserScreen.dart';
 import 'package:mondecare/feature/deleteUser/deletebloc/Repository/deleteRepository.dart';
 import 'package:mondecare/feature/home/home.dart';
@@ -15,7 +15,6 @@ import 'package:mondecare/feature/searchUser/searchbloc/Repository/searchReposit
 import 'package:mondecare/feature/signup/signup.dart';
 import 'package:mondecare/feature/splash/splash.dart';
 // import 'package:mondecare/feature/splash/splash.dart';
-import 'package:mondecare/firebase_options.dart';
 import 'package:mondecare/usercontrolrepository.dart';
 
 Future<void> main() async {
@@ -47,11 +46,9 @@ Future<void> main() async {
         addUserRoute: (context) => const addUserScreen(),
         searchUserRoute: (context) => const searchUserScreen(),
         logsScreenRoute: (context) => const logsScreen(),
-        deleteUserScreenRoute: (context) => const deleteUserScreen()
+        deleteUserScreenRoute: (context) => const deleteUserScreen(),
+        allUsersScreenRoute: (context) => const AllUsersScreen(),
       },
     ),
   ));
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
 }

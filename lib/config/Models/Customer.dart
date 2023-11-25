@@ -2,7 +2,6 @@
 
 class Customer {
   String AdminName,
-      CustomerID,
       CustomerName,
       CardNumber,
       IdentityNumber,
@@ -13,7 +12,6 @@ class Customer {
   Customer({
     required this.AdminName,
     required this.CustomerName,
-    required this.CustomerID,
     required this.CardNumber,
     required this.IdentityNumber,
     required this.PhoneNumber,
@@ -25,7 +23,6 @@ class Customer {
   Map<String, dynamic> toMap() {
     return {
       'AdminName': AdminName,
-      'CustomerID': CustomerID,
       'CustomerName': CustomerName,
       'CardNumber': CardNumber,
       'IdentityNumber': IdentityNumber,
@@ -41,7 +38,6 @@ class Customer {
     return {
       'fields': {
         'AdminName': {'stringValue': AdminName},
-        'CustomerID': {'stringValue': CustomerID},
         'CustomerName': {'stringValue': CustomerName},
         'CardNumber': {'stringValue': CardNumber},
         'IdentityNumber': {'stringValue': IdentityNumber},
@@ -52,5 +48,19 @@ class Customer {
         'Birthday': {'stringValue': Birthday.toIso8601String()},
       }
     };
+  }
+
+  factory Customer.fromJson(Map<String, dynamic> json) {
+    return Customer(
+      AdminName: json['AdminName'],
+      CustomerName: json['CustomerName'],
+      CardNumber: json['CardNumber'],
+      IdentityNumber: json['IdentityNumber'],
+      PhoneNumber: json['PhoneNumber'],
+      Country: json['Country'],
+      CardType: json['CardType'],
+      MemberShipDate: DateTime.parse(json['MemberShipDate']),
+      Birthday: DateTime.parse(json['Birthday']),
+    );
   }
 }

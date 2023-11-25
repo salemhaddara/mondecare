@@ -1,36 +1,53 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
+
 import 'package:mondecare/config/Models/Customer.dart';
-import 'package:mondecare/core/utils/Backend/Backend.dart';
+import 'package:http/http.dart' as http;
 
 class searchRepository {
-  late FirebaseFirestore db;
-  searchRepository() {
-    db = FirebaseFirestore.instance;
-  }
-  Future<Customer?>? searchUser(
-    String cardNumber,
-    Function(String) onfailed,
-  ) async {
+  static const String firebaseApiKey =
+      'AIzaSyCOv1iqZLuMtoOlPnehDbonzipB0izq9Ro';
+  static const String firebaseAuthURL =
+      'https://identitytoolkit.googleapis.com/v1/accounts';
+  static const String firestoreURL =
+      'https://firestore.googleapis.com/v1/projects/mondecare-3b42f/databases/(default)/documents';
+
+  Future<Customer?> searchUser(
+      String cardNumber, Function(String) onfailed) async {
     try {
-      QuerySnapshot result = await db
-          .collection(Backend.users)
-          .where(Backend.CardNumber, isEqualTo: cardNumber)
-          .get();
-      if (result.docs.isNotEmpty) {
-        return Customer(
-          AdminName: result.docs.first['AdminName'],
-          CustomerName: result.docs.first['CustomerName'],
-          CustomerID: result.docs.first['CustomerID'],
-          CardNumber: result.docs.first['CardNumber'],
-          IdentityNumber: result.docs.first['IdentityNumber'],
-          PhoneNumber: result.docs.first['PhoneNumber'],
-          Country: result.docs.first['Country'],
-          CardType: result.docs.first['CardType'],
-          MemberShipDate: DateTime.parse(result.docs.first['MemberShipDate']),
-          Birthday: DateTime.parse(result.docs.first['Birthday']),
+      final response = await http.get(
+        Uri.parse('$firestoreURL/customers'),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final List<dynamic> documents = data['documents'];
+
+        final user = documents.firstWhere(
+          (doc) =>
+              doc['fields'] != null &&
+              doc['fields']['CardNumber']['stringValue'] == cardNumber,
+          orElse: () => null,
         );
+
+        if (user != null) {
+          final userData = user['fields'];
+          return Customer(
+            AdminName: userData['AdminName']['stringValue'],
+            CustomerName: userData['CustomerName']['stringValue'],
+            CardNumber: userData['CardNumber']['stringValue'],
+            IdentityNumber: userData['IdentityNumber']['stringValue'],
+            PhoneNumber: userData['PhoneNumber']['stringValue'],
+            Country: userData['Country']['stringValue'],
+            CardType: userData['CardType']['stringValue'],
+            MemberShipDate:
+                DateTime.parse(userData['MemberShipDate']['stringValue']),
+            Birthday: DateTime.parse(userData['Birthday']['stringValue']),
+          );
+        } else {
+          onfailed('No Users Found With This Card Number');
+        }
       } else {
-        onfailed('No Users Found With This Card Number ');
+        onfailed('Failed to fetch data');
       }
     } catch (e) {
       print(e.toString());

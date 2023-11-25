@@ -56,7 +56,6 @@ class usercontrolrepository {
           final Map<String, dynamic> userData = documents.first['fields'];
           return Customer(
             AdminName: userData['AdminName']['stringValue'],
-            CustomerID: userData['CustomerID']['stringValue'],
             CustomerName: userData['CustomerName']['stringValue'],
             CardNumber: userData['CardNumber']['stringValue'],
             IdentityNumber: userData['IdentityNumber']['stringValue'],

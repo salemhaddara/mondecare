@@ -379,8 +379,8 @@ class _searchUserScreenState extends State<searchUserScreen> {
         mfile = File('');
       });
     } else {
-      Directory documentDirectory = await getApplicationDocumentsDirectory();
-      String documentPath = documentDirectory.path;
+      Directory? documentDirectory = await getDownloadsDirectory();
+      String documentPath = documentDirectory!.path;
 
       String filePath = '$documentPath/membership.pdf';
       final file = File(filePath);
@@ -388,6 +388,7 @@ class _searchUserScreenState extends State<searchUserScreen> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: text400normal(
               data: 'Pdf Saved in ${file.path}',
+              textColor: white,
               fontsize: size.height * 0.017)));
       setState(() {
         mfile = file;

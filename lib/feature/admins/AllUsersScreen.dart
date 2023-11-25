@@ -5,6 +5,9 @@ import 'package:mondecare/config/theme/colors.dart';
 import 'package:mondecare/config/theme/widgets/drawer.dart';
 import 'package:mondecare/config/theme/widgets/text400normal.dart';
 import 'package:mondecare/feature/admins/adminsStates/adminsbloc.dart';
+import 'package:mondecare/feature/admins/adminsStates/adminsevent.dart';
+import 'package:mondecare/feature/admins/adminsStates/adminsstate.dart';
+import 'package:mondecare/feature/admins/widgets/ContainerWithCircleAvatar.dart';
 
 class AllUsersScreen extends StatefulWidget {
   const AllUsersScreen({super.key});
@@ -31,7 +34,8 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
         ),
         drawer: drawer(choosed: 5),
         body: BlocProvider(
-          create: (context) => adminsbloc(context.read<AuthRepository>()),
+          create: (context) =>
+              adminsbloc(context.read<AuthRepository>())..add(requestUsers()),
           child: SafeArea(
             child: LayoutBuilder(builder: (context, constraints) {
               return SizedBox(
@@ -40,18 +44,37 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
                   child: Column(
                     children: [
                       _homeTitle(size),
-                      Expanded(
-                          child: Container(
+                      Expanded(child: BlocBuilder<adminsbloc, adminsstate>(
+                        builder: (context, state) {
+                          if (state.users.isEmpty) {
+                            return Expanded(
+                              child: Container(
+                                width: size.width * 0.2,
+                                height: size.width * 0.2,
+                                alignment: Alignment.center,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 6,
+                                  color: darkgrey,
+                                ),
+                              ),
+                            );
+                          }
+                          return Container(
                               constraints: const BoxConstraints(maxWidth: 600),
                               width: size.width,
                               child: ListView.builder(
-                                  itemCount: 4,
+                                  itemCount: state.users.length,
                                   physics: const BouncingScrollPhysics(),
                                   itemBuilder: (context, index) {
-                                    return null;
-//PUT HERE A BLOC BUILDER AND MAKE GIVE IT THE NAME EMAIL AND THE ID FROM THE STATE LIST
-                                    // return  ContainerWithCircleAvatar(name: ,);
-                                  }))),
+                                    return ContainerWithCircleAvatar(
+                                      name: state.users[index].name,
+                                      email: state.users[index].email,
+                                      id: state.users[index].id,
+                                      fontsize: size.width * 0.026,
+                                    );
+                                  }));
+                        },
+                      )),
                     ],
                   ));
             }),

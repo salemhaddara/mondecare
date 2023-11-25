@@ -302,11 +302,11 @@ class _addUserScreenState extends State<addUserScreen> {
                         customer: Customer(
                             AdminName: adminName ?? '',
                             CustomerName: Name ?? '',
-                            CustomerID: '',
                             CardNumber: CardNumber ?? '',
                             IdentityNumber: IdentityNumber ?? '',
                             PhoneNumber: PhoneNumber ?? '',
-                            Country: Country ?? '',
+                            Country:
+                                convertArabicCountryToEnglish(Country ?? ''),
                             CardType: CardType ?? '',
                             MemberShipDate: MemberShipDate ?? DateTime.now(),
                             Birthday: Birthday ?? DateTime.now()))));
