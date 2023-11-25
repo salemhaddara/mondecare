@@ -5,7 +5,7 @@ import 'package:mondecare/feature/signup/signupstates/signupstate.dart';
 import 'package:mondecare/feature/signup/signupsubmission/signupsubmissionevent.dart';
 
 class signupbloc extends Bloc<signupevent, signupstate> {
-  final authrepository repo;
+  final AuthRepository repo;
   signupbloc(this.repo) : super(signupstate()) {
     on<signupSubmitted>((event, emit) async {
       emit(state.copyWith(formstatus: signupformsubmitting()));
@@ -14,9 +14,8 @@ class signupbloc extends Bloc<signupevent, signupstate> {
           name: event.name,
           email: event.email,
           password: event.password,
-          onFailed: (json) {
-            emit(state.copyWith(
-                formstatus: signupsubmissionfailed(json['message'])));
+          onFailed: (message) {
+            emit(state.copyWith(formstatus: signupsubmissionfailed(message)));
           },
           onSuccess: (json) {
             emit(state.copyWith(formstatus: signupsubmissionsuccess()));

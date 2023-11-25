@@ -15,13 +15,16 @@ class adduser_bloc extends Bloc<adduser_event, adduser_state> {
       try {
         await repo.createCustomer(
           customer: event.customer,
-          onSuccess: (success) async {},
+          onSuccess: (success) async {
+            print('done');
+          },
           onFailed: (error) {
             throw Exception();
           },
         );
         emit(state.copyWith(requestStatus: successInsertion()));
       } catch (e) {
+        print(e.toString());
         emit(state.copyWith(requestStatus: failedInsertion(e.toString())));
       }
     });

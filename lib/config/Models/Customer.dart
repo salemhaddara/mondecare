@@ -36,4 +36,21 @@ class Customer {
       'Birthday': Birthday.toIso8601String(),
     };
   }
+
+  Map<String, dynamic> toMapWithType() {
+    return {
+      'fields': {
+        'AdminName': {'stringValue': AdminName},
+        'CustomerID': {'stringValue': CustomerID},
+        'CustomerName': {'stringValue': CustomerName},
+        'CardNumber': {'stringValue': CardNumber},
+        'IdentityNumber': {'stringValue': IdentityNumber},
+        'PhoneNumber': {'stringValue': PhoneNumber},
+        'Country': {'stringValue': Country},
+        'CardType': {'stringValue': CardType},
+        'MemberShipDate': {'stringValue': MemberShipDate.toIso8601String()},
+        'Birthday': {'stringValue': Birthday.toIso8601String()},
+      }
+    };
+  }
 }

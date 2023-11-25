@@ -44,7 +44,7 @@ class _signupState extends State<signup> {
       backgroundColor: white,
       resizeToAvoidBottomInset: false,
       body: BlocProvider(
-        create: (context) => signupbloc(context.read<authrepository>()),
+        create: (context) => signupbloc(context.read<AuthRepository>()),
         child: Directionality(
           textDirection:
               // defaultLang == 'ar' ? TextDirection.rtl :

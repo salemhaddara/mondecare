@@ -1,51 +1,77 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+// ignore_for_file: camel_case_types, avoid_print
+
+import 'dart:convert';
+
 import 'package:mondecare/config/Models/Customer.dart';
-import 'package:mondecare/config/Models/logEvent.dart';
+import 'package:http/http.dart' as http;
 import 'package:mondecare/core/utils/Backend/Backend.dart';
 
 class usercontrolrepository {
-  late FirebaseFirestore db;
-  usercontrolrepository() {
-    db = FirebaseFirestore.instance;
-  }
+  static const String firebaseApiKey =
+      'AIzaSyCOv1iqZLuMtoOlPnehDbonzipB0izq9Ro';
+  static const String firebaseAuthURL =
+      'https://identitytoolkit.googleapis.com/v1/accounts';
+  static const String firestoreURL =
+      'https://firestore.googleapis.com/v1/projects/mondecare-3b42f/databases/(default)/documents';
+
   Future<bool> createCustomer({
     required Customer customer,
     required Function(dynamic success) onSuccess,
     required Function(dynamic error) onFailed,
   }) async {
     try {
-      QuerySnapshot documents = await db
-          .collection(Backend.users)
-          .where(Backend.CardNumber, isEqualTo: customer.CardNumber)
-          .get();
-      if (documents.docs.isEmpty) {
-        await db.collection(Backend.users).add(customer.toMap()).then((value) {
-          db.collection(Backend.users).doc(value.id).update({
-            'CustomerID': value.id,
-          }).then((value) async {
-            await db.collection('logs').add(logEvent(customer.CardNumber,
-                    customer.AdminName, DateTime.now(), 'add')
-                .toMap());
-            onSuccess({
-              'success': true,
-              'message': 'Customer Registered Successfully'
-            });
-          }).catchError((onError) {
-            onFailed({'success': false, 'message': onError.toString()});
-          });
-          return true;
-        }).catchError((e) {
-          onFailed({'success': false, 'message': e.toString()});
-          return false;
-        });
+      final response = await http.post(
+        Uri.parse('$firestoreURL/${Backend.users}'),
+        body: json.encode(customer.toMapWithType()),
+        headers: {'Content-Type': 'application/json'},
+      );
+      print(response);
+      if (response.statusCode == 200) {
+        onSuccess(
+            {'success': true, 'message': 'Customer Registered Successfully'});
         return true;
       } else {
-        onFailed({'success': false, 'message': 'Customer Already Exists'});
+        print(json.decode(response.body));
+        onFailed(json.decode(response.body));
         return false;
       }
     } catch (e) {
+      print(e.toString());
       onFailed({'success': false, 'message': e.toString()});
       return false;
     }
+  }
+
+  static Future<Customer?> getCustomerByCardNumber(String cardNumber) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$firestoreURL/${Backend.users}?q=cardNumber==$cardNumber'),
+      );
+      print(response);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final List<dynamic> documents = data['documents'] ?? [];
+
+        if (documents.isNotEmpty) {
+          final Map<String, dynamic> userData = documents.first['fields'];
+          return Customer(
+            AdminName: userData['AdminName']['stringValue'],
+            CustomerID: userData['CustomerID']['stringValue'],
+            CustomerName: userData['CustomerName']['stringValue'],
+            CardNumber: userData['CardNumber']['stringValue'],
+            IdentityNumber: userData['IdentityNumber']['stringValue'],
+            PhoneNumber: userData['PhoneNumber']['stringValue'],
+            Country: userData['Country']['stringValue'],
+            CardType: userData['CardType']['stringValue'],
+            MemberShipDate:
+                DateTime.parse(userData['MemberShipDate']['stringValue']),
+            Birthday: DateTime.parse(userData['birthday']['stringValue']),
+          );
+        }
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    return null;
   }
 }

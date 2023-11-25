@@ -6,13 +6,13 @@ import 'package:mondecare/feature/admins/adminsStates/adminsevent.dart';
 import 'package:mondecare/feature/admins/adminsStates/adminsstate.dart';
 
 class adminsbloc extends Bloc<adminsevent, adminsstate> {
-  authrepository repo;
+  AuthRepository repo;
 
   adminsbloc(this.repo) : super(adminsstate(users: [])) {
     on<requestUsers>(
       (event, emit) async {
         emit(adminsstate(
-          users: await repo.getAllUsersFromCustomersCollection(),
+          users: await repo.getAllUsersFromFirestore(),
         ));
       },
     );

@@ -1,7 +1,7 @@
 // ignore_for_file: camel_case_types
 
-abstract class searchevent {}
+abstract class adminsevent {}
 
-class requestUsers extends searchevent {
+class requestUsers extends adminsevent {
   requestUsers();
 }

@@ -1,51 +1,77 @@
-// ignore_for_file: camel_case_types, invalid_return_type_for_catch_error
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:mondecare/config/Models/MyUser.dart';
-import 'package:mondecare/core/utils/Backend/Backend.dart';
-import 'package:mondecare/core/utils/Backend/UsertoMap.dart';
-import 'package:mondecare/core/utils/Preferences/Preferences.dart';
 
-class authrepository {
-  late FirebaseFirestore db;
+class AuthRepository {
+  static const String firebaseApiKey =
+      'AIzaSyCOv1iqZLuMtoOlPnehDbonzipB0izq9Ro';
+  static const String firebaseAuthURL =
+      'https://identitytoolkit.googleapis.com/v1/accounts';
+  static const String firestoreURL =
+      'https://firestore.googleapis.com/v1/projects/mondecare-3b42f/databases/(default)/documents';
 
-  authrepository() {
-    db = FirebaseFirestore.instance;
-  }
-  login(
+  Future<void> login(
     String email,
     String password,
-    Function(dynamic success) onSuccess,
+    Function(MyUser success) onSuccess,
     Function(dynamic error) onFailed,
   ) async {
     try {
-      final credentialinfo = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
-      await db
-          .collection(Backend.customers)
-          .where(Backend.idField, isEqualTo: credentialinfo.user!.uid)
-          .get()
-          .then((value) async {
-        await Preferences.saveEmail(await value.docs[0][Backend.emailField]);
-        await Preferences.saveName(await value.docs[0][Backend.nameField]);
-        await Preferences.saveUserId(await value.docs[0][Backend.idField]);
-      });
-      await onSuccess(credentialinfo);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        await onFailed('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        await onFailed('Wrong password provided for that user.');
-      } else if (e.code == 'INVALID_LOGIN_CREDENTIALS') {
-        await onFailed('Invalid Credentials');
+      final response = await http.post(
+        Uri.parse('$firebaseAuthURL:signInWithPassword?key=$firebaseApiKey'),
+        body: json.encode({
+          'email': email,
+          'password': password,
+          'returnSecureToken': true,
+        }),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        MyUser? user = await getUserByEmail(email);
+        if (user != null) {
+          await onSuccess(user);
+        } else {
+          await onFailed('User Data Not Found');
+        }
       } else {
-        await onFailed('Invalid Credentials');
+        await onFailed(json.decode(response.body)['error']['message']);
       }
+    } catch (e) {
+      print(e.toString());
+      await onFailed('Error: $e');
     }
   }
 
-  Future<bool> signUpUser({
+  Future<MyUser?> getUserByEmail(String email) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$firestoreURL/users'),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        print(response.body);
+        final List<dynamic> users = data['documents'];
+
+        // Search for the user by email
+        for (var user in users) {
+          final userEmail = user['fields']['email']['stringValue'];
+          print(userEmail);
+          if (userEmail == email) {
+            return MyUser(
+              name: user['fields']['name']['stringValue'],
+              id: user['name'],
+              email: userEmail,
+            );
+          }
+        }
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  Future<void> signUpUser({
     required String name,
     required String email,
     required String password,
@@ -53,61 +79,73 @@ class authrepository {
     required Function(dynamic error) onFailed,
   }) async {
     try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
+      MyUser? existingUser = await getUserByEmail(email);
+      if (existingUser != null) {
+        onFailed('User already exists');
+        return;
+      }
+
+      final response = await http.post(
+        Uri.parse('$firebaseAuthURL:signUp?key=$firebaseApiKey'),
+        body: json.encode({
+          'email': email,
+          'password': password,
+          'returnSecureToken': true,
+        }),
+        headers: {'Content-Type': 'application/json'},
       );
-      QuerySnapshot documents = await db
-          .collection(Backend.customers)
-          .where(Backend.emailField, isEqualTo: email)
-          .get();
-      if (documents.docs.isEmpty) {
-        await db.collection(Backend.customers).add(
-              UsertoMap.convert(MyUser(
-                id: userCredential.user!.uid,
-                name: name,
-                email: email,
-              )),
-            );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final userId = responseData['localId'];
+
+        // Example: Add user details to Firestore
+        await http.post(
+          Uri.parse('$firestoreURL/users'),
+          body: json.encode({
+            'fields': {
+              'userId': {'stringValue': userId},
+              'name': {'stringValue': name},
+              'email': {'stringValue': email},
+            },
+          }),
+          headers: {'Content-Type': 'application/json'},
+        );
+
         onSuccess({'success': true, 'message': 'User Registered Successfully'});
-        return true;
       } else {
-        onFailed({'success': false, 'message': 'User Already Exists'});
-        return false;
+        onFailed(json.decode(response.body));
       }
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        onFailed({'success': false, 'message': 'Weak password'});
-      } else if (e.code == 'email-already-in-use') {
-        onFailed({'success': false, 'message': 'Email already in use'});
-      } else {
-        onFailed({'success': false, 'message': e.toString()});
-      }
-      return false;
     } catch (e) {
-      onFailed({'success': false, 'message': e.toString()});
-      return false;
+      onFailed('Error: $e');
     }
   }
 
-  Future<List<MyUser>> getAllUsersFromCustomersCollection() async {
-    List<MyUser> users = List.empty(growable: true);
+  Future<List<MyUser>> getAllUsersFromFirestore() async {
     try {
-      QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance.collection(Backend.users).get();
+      final response = await http.get(
+        Uri.parse('$firestoreURL/collectionName.json'),
+      );
 
-      users = querySnapshot.docs.map((documentSnapshot) {
-        final userData = documentSnapshot.data() as Map<String, dynamic>;
-        return MyUser(
-          name: userData['name'],
-          id: userData['id'],
-          email: userData['email'],
-        );
-      }).toList();
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final List<MyUser> users = [];
+
+        data.forEach((key, value) {
+          final user = MyUser.fromJson({
+            'name': value['name'],
+            'id': key,
+            'email': value['email'],
+          });
+          users.add(user);
+        });
+
+        return users;
+      } else {
+        return [];
+      }
     } catch (e) {
-      print('Error fetching users: $e');
+      return [];
     }
-    return users;
   }
 }

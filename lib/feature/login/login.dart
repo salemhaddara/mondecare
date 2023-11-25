@@ -41,7 +41,7 @@ class _loginState extends State<login> {
       resizeToAvoidBottomInset: false,
       backgroundColor: white,
       body: BlocProvider(
-        create: (context) => loginbloc(context.read<authrepository>()),
+        create: (context) => loginbloc(context.read<AuthRepository>()),
         child: Directionality(
           textDirection: TextDirection.ltr,
           child: Stack(

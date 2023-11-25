@@ -1,6 +1,5 @@
 // ignore_for_file: camel_case_types
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mondecare/authrepository.dart';
 import 'package:mondecare/core/utils/Preferences/Preferences.dart';
@@ -9,14 +8,13 @@ import 'package:mondecare/feature/login/loginstates/loginstate.dart';
 import 'package:mondecare/feature/login/submission/submissionevent.dart';
 
 class loginbloc extends Bloc<loginevent, loginstate> {
-  final authrepository repo;
+  final AuthRepository repo;
   loginbloc(this.repo) : super(loginstate()) {
     on<loginSubmitted>((event, emit) async {
       emit(state.copyWith(formstatus: formsubmitting()));
       try {
         await repo.login(event.email, event.password, (success) async {
-          if (await Preferences.saveUserId(
-              (success as UserCredential).user!.uid)) {
+          if (await Preferences.saveUserId((success.id))) {
             emit(state.copyWith(formstatus: submissionsuccess()));
           } else {
             emit(state.copyWith(

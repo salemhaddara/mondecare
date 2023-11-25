@@ -13,6 +13,7 @@ import 'package:mondecare/feature/logs/logsStates/Repo/logsrepository.dart';
 import 'package:mondecare/feature/searchUser/searchUserScreen.dart';
 import 'package:mondecare/feature/searchUser/searchbloc/Repository/searchRepository.dart';
 import 'package:mondecare/feature/signup/signup.dart';
+import 'package:mondecare/feature/splash/splash.dart';
 // import 'package:mondecare/feature/splash/splash.dart';
 import 'package:mondecare/firebase_options.dart';
 import 'package:mondecare/usercontrolrepository.dart';
@@ -22,7 +23,7 @@ Future<void> main() async {
 
   runApp(MultiRepositoryProvider(
     providers: [
-      RepositoryProvider(create: ((context) => authrepository())),
+      RepositoryProvider(create: ((context) => AuthRepository())),
       RepositoryProvider(
         create: ((context) => usercontrolrepository()),
       ),
@@ -37,7 +38,7 @@ Future<void> main() async {
       ),
     ],
     child: MaterialApp(
-      home: const home(),
+      home: const splash(),
       debugShowCheckedModeBanner: false,
       routes: {
         loginscreenRoute: (context) => const login(),
