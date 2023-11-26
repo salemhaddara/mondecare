@@ -13,6 +13,7 @@ class InputField extends StatefulWidget {
   final Function(String?) onChanged;
   double? height;
   bool? withStroke;
+  bool isNumber;
   InputField(
       {Key? key,
       required this.isPassword,
@@ -22,6 +23,7 @@ class InputField extends StatefulWidget {
       required this.onChanged,
       this.height,
       this.withStroke,
+      this.isNumber = false,
       this.color})
       : super(key: key);
 
@@ -47,6 +49,8 @@ class _InputFieldState extends State<InputField> {
             },
             obscureText: isVisible,
             cursorColor: darkgrey,
+            keyboardType:
+                widget.isNumber ? TextInputType.number : TextInputType.name,
             maxLines: widget.height != null ? 4 : 1,
             validator: widget.validator,
             autovalidateMode: AutovalidateMode.always,

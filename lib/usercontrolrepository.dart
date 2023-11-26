@@ -54,6 +54,18 @@ class usercontrolrepository {
     }
   }
 
+  Future<void> saveloginLog() async {
+    await http.post(
+      Uri.parse('$firestoreURL/logs'),
+      body: json.encode(
+        logEvent('N/A', await Preferences.getName() ?? 'N/A', DateTime.now(),
+                'login')
+            .toMapWithType(),
+      ),
+      headers: {'Content-Type': 'application/json'},
+    );
+  }
+
   static Future<Customer?> getCustomerByCardNumber(String cardNumber) async {
     try {
       final response = await http.get(
@@ -84,5 +96,45 @@ class usercontrolrepository {
       print(e.toString());
     }
     return null;
+  }
+
+  Future<List<Customer>> getAllCustomersFromFirestore() async {
+    try {
+      final response = await http.get(Uri.parse('$firestoreURL/customers'));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final List<Customer> users = [];
+
+        if (data.containsKey('documents')) {
+          final List<dynamic> documents = data['documents'];
+
+          for (final doc in documents) {
+            final fields = doc['fields'] as Map<String, dynamic>?;
+
+            if (fields != null) {
+              users.add(Customer(
+                AdminName: fields['AdminName']['stringValue'],
+                CustomerName: fields['CustomerName']['stringValue'],
+                CardNumber: fields['CardNumber']['stringValue'],
+                IdentityNumber: fields['IdentityNumber']['stringValue'],
+                PhoneNumber: fields['PhoneNumber']['stringValue'],
+                Country: fields['Country']['stringValue'],
+                CardType: fields['CardType']['stringValue'],
+                MemberShipDate:
+                    DateTime.parse(fields['MemberShipDate']['stringValue']),
+                Birthday: DateTime.parse(fields['Birthday']['stringValue']),
+              ));
+            }
+          }
+        }
+
+        return users;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
   }
 }

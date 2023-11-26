@@ -61,18 +61,51 @@ class _addUserScreenState extends State<addUserScreen> {
                 margin: EdgeInsets.all(size.width * 0.02),
                 child: Wrap(
                   children: [
-                    _field(size, 'Admin Name', (text) {
-                      adminName = text ?? '';
-                    }),
-                    _field(size, 'Name ', (text) {
-                      Name = text ?? '';
-                    }),
-                    _field(size, 'Identity Number', (text) {
-                      IdentityNumber = text ?? '';
-                    }),
-                    _field(size, 'Card Number', (text) {
-                      CardNumber = text ?? '';
-                    }),
+                    _field(
+                        size,
+                        'Admin Name',
+                        (text) {
+                          adminName = text ?? '';
+                        },
+                        false,
+                        (text) {
+                          return null;
+                        }),
+                    _field(
+                        size,
+                        'Name ',
+                        (text) {
+                          Name = text ?? '';
+                        },
+                        false,
+                        (text) {
+                          return null;
+                        }),
+                    _field(
+                        size,
+                        'Identity Number',
+                        (text) {
+                          IdentityNumber = text ?? '';
+                        },
+                        false,
+                        (text) {
+                          return null;
+                        }),
+                    _field(
+                        size,
+                        'Card Number',
+                        (text) {
+                          CardNumber = text ?? '';
+                        },
+                        true,
+                        (text) {
+                          if (text != null &&
+                              text.isNotEmpty &&
+                              text.length < 16) {
+                            return 'Card Number Characters Must be =16';
+                          }
+                          return null;
+                        }),
                     _countryChooser(size),
                     _phoneNumber(size),
                     _datePickerBirthday(size, 'Birthday'),
@@ -211,7 +244,8 @@ class _addUserScreenState extends State<addUserScreen> {
     );
   }
 
-  _field(Size size, String fieldTitle, Function(String?) onChanged) {
+  _field(Size size, String fieldTitle, Function(String?) onChanged,
+      bool isNumber, String? Function(String?) validator) {
     return Container(
       margin: const EdgeInsets.all(16),
       constraints: const BoxConstraints(maxWidth: 500),
@@ -222,8 +256,9 @@ class _addUserScreenState extends State<addUserScreen> {
               isPassword: false,
               hint: '',
               initialState: false,
+              isNumber: isNumber,
               validator: (text) {
-                return null;
+                return validator(text);
               },
               onChanged: (text) {
                 onChanged(text);
@@ -367,8 +402,6 @@ class _addUserScreenState extends State<addUserScreen> {
         return 'Morocco';
       case 'عمان':
         return 'Oman';
-      case 'فلسطين':
-        return 'Palestine';
       case 'قطر':
         return 'Qatar';
       case 'العربية السعودية':

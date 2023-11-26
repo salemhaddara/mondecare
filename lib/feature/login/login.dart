@@ -25,6 +25,8 @@ class login extends StatefulWidget {
   State<login> createState() => _loginState();
 }
 
+bool thefirsttime = true;
+
 class _loginState extends State<login> {
   final formKey = GlobalKey<FormState>();
   String emailcheck = '', passwordcheck = '';
