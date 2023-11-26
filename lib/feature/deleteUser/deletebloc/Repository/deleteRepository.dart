@@ -1,48 +1,59 @@
 // ignore_for_file: camel_case_types,file_names
 
 import 'dart:async';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:mondecare/config/Models/logEvent.dart';
-import 'package:mondecare/core/utils/Backend/Backend.dart';
-import 'package:mondecare/core/utils/Preferences/Preferences.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class deleteRepository {
-  late FirebaseFirestore db;
-  deleteRepository() {
-    db = FirebaseFirestore.instance;
-  }
-  Future<bool> deleteUser(
-    String cardNumber,
-    Function(String) onfailed,
-  ) async {
-    try {
-      QuerySnapshot result = await db
-          .collection(Backend.users)
-          .where(Backend.CardNumber, isEqualTo: cardNumber)
-          .get();
-      if (result.docs.isNotEmpty) {
-        var documentReference = result.docs.first.reference;
-        try {
-          await documentReference.delete();
-          await db.collection('logs').add(logEvent(
-                  cardNumber,
-                  await Preferences.getName() ?? 'N/A',
-                  DateTime.now(),
-                  'Delete')
-              .toMap());
-          return true;
-        } catch (e) {
-          onfailed('Something Went Wrong');
+  static const String firebaseApiKey =
+      'AIzaSyCOv1iqZLuMtoOlPnehDbonzipB0izq9Ro';
+  static const String firebaseAuthURL =
+      'https://identitytoolkit.googleapis.com/v1/accounts';
+  static const String firestoreURL =
+      'https://firestore.googleapis.com/v1/projects/mondecare-3b42f/databases/(default)/documents';
 
+  Future<bool> deleteUser(String cardNumber, Function(String) onFailed) async {
+    try {
+      final response = await http.get(Uri.parse('$firestoreURL/customers'));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body) as Map<String, dynamic>;
+        final List<dynamic>? documents = data['documents'] as List<dynamic>?;
+
+        if (documents != null && documents.isNotEmpty) {
+          final userEntry = documents.firstWhere(
+            (entry) =>
+                entry is Map<String, dynamic> &&
+                entry['fields'] != null &&
+                entry['fields']['CardNumber']?['stringValue'] == cardNumber,
+            orElse: () => null,
+          );
+
+          if (userEntry != null) {
+            final documentId = userEntry['name'].split('/').last;
+            final deleteResponse = await http
+                .delete(Uri.parse('$firestoreURL/customers/$documentId'));
+
+            if (deleteResponse.statusCode == 200) {
+              print('Deleted user successfully');
+              return true;
+            } else {
+              onFailed('Failed to delete user');
+              return false;
+            }
+          } else {
+            onFailed('No Users Found With This Card Number');
+            return false;
+          }
+        } else {
+          onFailed('No documents found');
           return false;
         }
       } else {
-        onfailed('No Users Found With This Card Number ');
+        onFailed('Failed to fetch data');
         return false;
       }
     } catch (e) {
-      onfailed(e.toString());
+      onFailed(e.toString());
       return false;
     }
   }

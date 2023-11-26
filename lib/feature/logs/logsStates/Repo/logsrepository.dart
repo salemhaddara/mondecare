@@ -34,6 +34,7 @@ class logsrepository {
             'type': fields['type']['stringValue'],
           }));
         }
+        logEvents.sort((a, b) => b.time.compareTo(a.time));
 
         return logEvents;
       } else {
@@ -45,19 +46,4 @@ class logsrepository {
       return [];
     }
   }
-  // Future<List<logEvent>> fetchLogsFromFirestore() async {
-  //   List<logEvent> logEvents = [];
-  //   logEvent logevent;
-
-  //   QuerySnapshot querySnapshot =
-  //       await FirebaseFirestore.instance.collection('logs').get();
-
-  //   for (var doc in querySnapshot.docs) {
-  //     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-  //     logevent = logEvent.fromMap(data);
-  //     logEvents.add(logevent);
-  //   }
-
-  //   return logEvents;
-  // }
 }

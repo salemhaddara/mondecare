@@ -85,6 +85,7 @@ class _deleteUserScreenState extends State<deleteUserScreen> {
       } else if (state.statusTracker is Searching) {
         return Center(child: _searchingWidget(size));
       } else if (state.statusTracker is NotFoundSearchedNUmber) {
+        print((state.statusTracker as NotFoundSearchedNUmber).exception);
         return _NotFoundWidget(size);
       } else {
         return Container();

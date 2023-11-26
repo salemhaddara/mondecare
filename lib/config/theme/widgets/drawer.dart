@@ -71,13 +71,6 @@ class _drawerState extends State<drawer> {
           ),
           _drawerlistItem(
             size,
-            'Insights',
-            'insightswhite',
-            widget.choosed == 4,
-            homescreenRoute,
-          ),
-          _drawerlistItem(
-            size,
             'Admins',
             'adminwhite',
             widget.choosed == 5,

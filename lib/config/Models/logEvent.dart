@@ -21,4 +21,14 @@ class logEvent {
       map['type'] as String,
     );
   }
+  Map<String, dynamic> toMapWithType() {
+    return {
+      "fields": {
+        'user': {'stringValue': user},
+        'type': {'stringValue': type},
+        'admin': {'stringValue': admin},
+        'time': {'stringValue': time.toUtc().toIso8601String()},
+      }
+    };
+  }
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mondecare/authrepository.dart';
@@ -44,11 +46,11 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
                   child: Column(
                     children: [
                       _homeTitle(size),
-                      Expanded(child: BlocBuilder<adminsbloc, adminsstate>(
-                        builder: (context, state) {
-                          if (state.users.isEmpty) {
-                            return Expanded(
-                              child: Container(
+                      Expanded(
+                        child: BlocBuilder<adminsbloc, adminsstate>(
+                          builder: (context, state) {
+                            if (state.users.isEmpty) {
+                              return Container(
                                 width: size.width * 0.2,
                                 height: size.width * 0.2,
                                 alignment: Alignment.center,
@@ -56,25 +58,26 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
                                   strokeWidth: 6,
                                   color: darkgrey,
                                 ),
-                              ),
-                            );
-                          }
-                          return Container(
-                              constraints: const BoxConstraints(maxWidth: 600),
-                              width: size.width,
-                              child: ListView.builder(
-                                  itemCount: state.users.length,
-                                  physics: const BouncingScrollPhysics(),
-                                  itemBuilder: (context, index) {
-                                    return ContainerWithCircleAvatar(
-                                      name: state.users[index].name,
-                                      email: state.users[index].email,
-                                      id: state.users[index].id,
-                                      fontsize: size.width * 0.026,
-                                    );
-                                  }));
-                        },
-                      )),
+                              );
+                            }
+                            return Container(
+                                constraints:
+                                    const BoxConstraints(maxWidth: 600),
+                                width: size.width,
+                                child: ListView.builder(
+                                    itemCount: state.users.length,
+                                    physics: const BouncingScrollPhysics(),
+                                    itemBuilder: (context, index) {
+                                      return ContainerWithCircleAvatar(
+                                        name: state.users[index].name,
+                                        email: state.users[index].email,
+                                        id: state.users[index].id,
+                                        fontsize: size.width * 0.026,
+                                      );
+                                    }));
+                          },
+                        ),
+                      ),
                     ],
                   ));
             }),

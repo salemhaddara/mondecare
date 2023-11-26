@@ -65,7 +65,6 @@ class _homeState extends State<home> {
       children: [
         _homelistItem(size, 'searchuser', 'Search User', searchUserRoute),
         _homelistItem(size, 'adduser', 'Add User', addUserRoute),
-        _homelistItem(size, 'insights', 'Insights', addUserRoute),
         _homelistItem(size, 'admin', 'Admins', allUsersScreenRoute),
         _homelistItem(size, 'deleteuser', 'Delete User', deleteUserScreenRoute),
         _homelistItem(size, 'logs', 'Logs', logsScreenRoute),

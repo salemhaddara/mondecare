@@ -4,7 +4,9 @@ import 'dart:convert';
 
 import 'package:mondecare/config/Models/Customer.dart';
 import 'package:http/http.dart' as http;
+import 'package:mondecare/config/Models/logEvent.dart';
 import 'package:mondecare/core/utils/Backend/Backend.dart';
+import 'package:mondecare/core/utils/Preferences/Preferences.dart';
 
 class usercontrolrepository {
   static const String firebaseApiKey =
@@ -25,10 +27,20 @@ class usercontrolrepository {
         body: json.encode(customer.toMapWithType()),
         headers: {'Content-Type': 'application/json'},
       );
-      print(response);
+      final response2 = await http.post(
+        Uri.parse('$firestoreURL/logs'),
+        body: json.encode(
+          logEvent(customer.CardNumber, await Preferences.getName() ?? 'N/A',
+                  DateTime.now(), 'add')
+              .toMapWithType(),
+        ),
+        headers: {'Content-Type': 'application/json'},
+      );
+      print(response2.body);
       if (response.statusCode == 200) {
         onSuccess(
             {'success': true, 'message': 'Customer Registered Successfully'});
+
         return true;
       } else {
         print(json.decode(response.body));
