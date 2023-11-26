@@ -51,6 +51,7 @@ dependencies:
   html: ^0.15.4
   http: ^1.1.0
   syncfusion_flutter_charts: ^23.2.4
+  open_file_plus: ^3.4.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

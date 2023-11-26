@@ -50,7 +50,6 @@ class searchRepository {
         onfailed('Failed to fetch data');
       }
     } catch (e) {
-      print(e.toString());
       onfailed(e.toString());
     }
 

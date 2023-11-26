@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:mondecare/config/Models/logEvent.dart';
 import 'package:mondecare/core/utils/Backend/Backend.dart';
 import 'package:mondecare/core/utils/Preferences/Preferences.dart';
+import 'package:mondecare/feature/searchUser/searchbloc/Repository/searchRepository.dart';
 
 class usercontrolrepository {
   static const String firebaseApiKey =
@@ -21,30 +22,36 @@ class usercontrolrepository {
     required Function(dynamic success) onSuccess,
     required Function(dynamic error) onFailed,
   }) async {
+    searchRepository repo = searchRepository();
     try {
-      final response = await http.post(
-        Uri.parse('$firestoreURL/${Backend.users}'),
-        body: json.encode(customer.toMapWithType()),
-        headers: {'Content-Type': 'application/json'},
-      );
-      final response2 = await http.post(
-        Uri.parse('$firestoreURL/logs'),
-        body: json.encode(
-          logEvent(customer.CardNumber, await Preferences.getName() ?? 'N/A',
-                  DateTime.now(), 'add')
-              .toMapWithType(),
-        ),
-        headers: {'Content-Type': 'application/json'},
-      );
-      print(response2.body);
-      if (response.statusCode == 200) {
-        onSuccess(
-            {'success': true, 'message': 'Customer Registered Successfully'});
+      if (await repo.searchUser(customer.CardNumber, (failed) {}) == null) {
+        final response = await http.post(
+          Uri.parse('$firestoreURL/${Backend.users}'),
+          body: json.encode(customer.toMapWithType()),
+          headers: {'Content-Type': 'application/json'},
+        );
+        final response2 = await http.post(
+          Uri.parse('$firestoreURL/logs'),
+          body: json.encode(
+            logEvent(customer.CardNumber, await Preferences.getName() ?? 'N/A',
+                    DateTime.now(), 'add')
+                .toMapWithType(),
+          ),
+          headers: {'Content-Type': 'application/json'},
+        );
+        print(response2.body);
+        if (response.statusCode == 200) {
+          onSuccess(
+              {'success': true, 'message': 'Customer Registered Successfully'});
 
-        return true;
+          return true;
+        } else {
+          print(json.decode(response.body));
+          onFailed(json.decode(response.body));
+          return false;
+        }
       } else {
-        print(json.decode(response.body));
-        onFailed(json.decode(response.body));
+        onFailed('Customer Already Exists');
         return false;
       }
     } catch (e) {
@@ -64,38 +71,6 @@ class usercontrolrepository {
       ),
       headers: {'Content-Type': 'application/json'},
     );
-  }
-
-  static Future<Customer?> getCustomerByCardNumber(String cardNumber) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$firestoreURL/${Backend.users}?q=cardNumber==$cardNumber'),
-      );
-      print(response);
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        final List<dynamic> documents = data['documents'] ?? [];
-
-        if (documents.isNotEmpty) {
-          final Map<String, dynamic> userData = documents.first['fields'];
-          return Customer(
-            AdminName: userData['AdminName']['stringValue'],
-            CustomerName: userData['CustomerName']['stringValue'],
-            CardNumber: userData['CardNumber']['stringValue'],
-            IdentityNumber: userData['IdentityNumber']['stringValue'],
-            PhoneNumber: userData['PhoneNumber']['stringValue'],
-            Country: userData['Country']['stringValue'],
-            CardType: userData['CardType']['stringValue'],
-            MemberShipDate:
-                DateTime.parse(userData['MemberShipDate']['stringValue']),
-            Birthday: DateTime.parse(userData['birthday']['stringValue']),
-          );
-        }
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-    return null;
   }
 
   Future<List<Customer>> getAllCustomersFromFirestore() async {

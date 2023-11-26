@@ -295,9 +295,8 @@ class _addUserScreenState extends State<addUserScreen> {
       }
       if (state.requestStatus is failedInsertion && !isError) {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
-          ScaffoldMessenger.of(pagecontext).showSnackBar(showSnackbar(
-              (state.requestStatus as failedInsertion).exception.toString(),
-              size));
+          ScaffoldMessenger.of(pagecontext).showSnackBar(
+              showSnackbar('Card Number is Already Registered', size));
           state.copyWith(requestStatus: waitingrequest());
           context.read<adduser_bloc>().add(returnInitial());
         });

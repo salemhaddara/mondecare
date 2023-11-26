@@ -19,6 +19,7 @@ import 'package:mondecare/feature/searchUser/searchbloc/searchStateTracker/searc
 import 'package:mondecare/feature/searchUser/searchbloc/searchbloc.dart';
 import 'package:mondecare/feature/searchUser/searchbloc/searchevent.dart';
 import 'package:mondecare/feature/searchUser/searchbloc/searchstate.dart';
+import 'package:open_file_plus/open_file_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -386,13 +387,30 @@ class _searchUserScreenState extends State<searchUserScreen> {
       final file = File(filePath);
       await file.writeAsBytes(savedFile);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: text400normal(
-              data: 'Pdf Saved in ${file.path}',
-              textColor: white,
-              fontsize: size.height * 0.017)));
+        content: text400normal(
+            data: 'Pdf Saved in ${file.path}',
+            textColor: white,
+            fontsize: size.height * 0.017),
+        action: SnackBarAction(
+          label: 'Open',
+          onPressed: () {
+            openFile(file.path);
+          },
+          textColor: Colors.white,
+        ),
+      ));
       setState(() {
         mfile = file;
       });
+    }
+  }
+
+  void openFile(String filePath) async {
+    File file = File(filePath);
+    if (await file.exists()) {
+      await OpenFile.open(filePath);
+    } else {
+      print('File does not exist.');
     }
   }
 
