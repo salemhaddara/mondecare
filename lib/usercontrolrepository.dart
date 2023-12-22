@@ -30,16 +30,15 @@ class usercontrolrepository {
           body: json.encode(customer.toMapWithType()),
           headers: {'Content-Type': 'application/json'},
         );
-        final response2 = await http.post(
-          Uri.parse('$firestoreURL/logs'),
-          body: json.encode(
-            logEvent(customer.CardNumber, await Preferences.getName() ?? 'N/A',
-                    DateTime.now(), 'add')
-                .toMapWithType(),
-          ),
-          headers: {'Content-Type': 'application/json'},
-        );
-        print(response2.body);
+        // final response2 = await http.post(
+        //   Uri.parse('$firestoreURL/logs'),
+        //   body: json.encode(
+        //     logEvent(customer.CardNumber, await Preferences.getName() ?? 'N/A',
+        //             DateTime.now(), 'add')
+        //         .toMapWithType(),
+        //   ),
+        //   headers: {'Content-Type': 'application/json'},
+        // );
         if (response.statusCode == 200) {
           onSuccess(
               {'success': true, 'message': 'Customer Registered Successfully'});
@@ -65,8 +64,8 @@ class usercontrolrepository {
     await http.post(
       Uri.parse('$firestoreURL/logs'),
       body: json.encode(
-        logEvent('N/A', await Preferences.getName() ?? 'N/A', DateTime.now(),
-                'login')
+        logEvent('N/A', await Preferences.getUserName() ?? 'N/A',
+                DateTime.now(), 'login')
             .toMapWithType(),
       ),
       headers: {'Content-Type': 'application/json'},

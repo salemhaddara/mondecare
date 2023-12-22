@@ -22,19 +22,19 @@ class Preferences {
 
 //----------------------------------------------------------------------------------------------
 //Nmae From the Last Login
-  static Future<bool> saveName(String name) async {
+  static Future<bool> saveUserName(String name) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.setString('name', name);
+    return prefs.setString('username', name);
   }
 
-  static Future<String?> getName() async {
+  static Future<String?> getUserName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('name');
+    return prefs.getString('username');
   }
 
-  static Future<bool> nameexist() async {
+  static Future<bool> userNameexist() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.containsKey('name');
+    return prefs.containsKey('username');
   }
 
   //----------------------------------------------------------------------------------------------

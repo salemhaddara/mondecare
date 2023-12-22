@@ -1,3 +1,5 @@
+// ignore_for_file: camel_case_types
+
 abstract class signupevent {}
 
 class signupPhoneNumberChanged extends signupevent {
@@ -21,9 +23,12 @@ class signupEmailChanged extends signupevent {
 }
 
 class signupSubmitted extends signupevent {
-  String email, password, name;
+  String email, password, name, username;
   signupSubmitted(
-      {required this.email, required this.password, required this.name});
+      {required this.email,
+      required this.password,
+      required this.name,
+      required this.username});
 }
 
 class returninitial extends signupevent {}

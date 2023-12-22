@@ -71,6 +71,7 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
                                       return ContainerWithCircleAvatar(
                                         name: state.users[index].name,
                                         email: state.users[index].email,
+                                        username: state.users[index].username,
                                         id: state.users[index].id,
                                         fontsize: size.width * 0.026,
                                       );

@@ -24,7 +24,6 @@ class adduser_bloc extends Bloc<adduser_event, adduser_state> {
         );
         emit(state.copyWith(requestStatus: successInsertion()));
       } catch (e) {
-        print(e.toString());
         emit(state.copyWith(requestStatus: failedInsertion(e.toString())));
       }
     });

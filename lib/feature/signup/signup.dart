@@ -29,6 +29,7 @@ class signup extends StatefulWidget {
 class _signupState extends State<signup> {
   final formKey = GlobalKey<FormState>();
   String phoneNumbercheck = '',
+      usernamecheck = '',
       namecheck = '',
       emailcheck = '',
       passwordcheck = '';
@@ -133,6 +134,8 @@ class _signupState extends State<signup> {
             _codeInputField(size),
             _nameTitle(size),
             _nameInputField(size),
+            _usernameTitle(size),
+            _usernameField(size),
             _emailTitle(size),
             _emailInputField(size),
             _passwordTitle(size),
@@ -202,6 +205,19 @@ class _signupState extends State<signup> {
     );
   }
 
+  Widget _usernameTitle(Size size) {
+    return Container(
+      width: size.width,
+      constraints: const BoxConstraints(maxWidth: 600),
+      margin: const EdgeInsets.only(top: 10, bottom: 10),
+      child: text400normal(
+        data: 'UserName',
+        textColor: darkgrey,
+        fontsize: size.height * 0.017,
+      ),
+    );
+  }
+
   Widget _nameInputField(Size size) {
     return InputField(
       hint: '',
@@ -232,6 +248,32 @@ class _signupState extends State<signup> {
         textColor: darkgrey,
         fontsize: size.height * 0.017,
       ),
+    );
+  }
+
+  Widget _usernameField(Size size) {
+    return InputField(
+      hint: '',
+      isPassword: false,
+      validator: (username) {
+        if (username!.isEmpty) {
+          return null;
+        }
+        if ((username.isNotEmpty) && username.length < 3) {
+          return 'Username Must be More than 3 characters';
+        }
+        if ((username.isNotEmpty) && username.length > 8) {
+          return 'Username Must be less than 8 characters';
+        }
+        if (!isUsernameValid(username)) {
+          return 'Spaces Not permitted';
+        }
+        return null;
+      },
+      initialState: false,
+      onChanged: (text) {
+        usernamecheck = '$text';
+      },
     );
   }
 
@@ -308,7 +350,8 @@ class _signupState extends State<signup> {
                       context.read<signupbloc>().add((signupSubmitted(
                           email: emailcheck,
                           password: passwordcheck,
-                          name: namecheck)));
+                          name: namecheck,
+                          username: usernamecheck)));
                     } else {
                       ScaffoldMessenger.of(pagecontext).showSnackBar(
                           showSnackbar('Fill All Required Data', size));
@@ -367,5 +410,12 @@ class _signupState extends State<signup> {
     RegExp emailRegExp =
         RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
     return emailRegExp.hasMatch(email);
+  }
+
+  bool isUsernameValid(String username) {
+    if (!username.contains(' ')) {
+      return true;
+    }
+    return false;
   }
 }

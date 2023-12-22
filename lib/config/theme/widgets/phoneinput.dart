@@ -69,22 +69,7 @@ class _phoneinputState extends State<phoneinput> {
           style: GoogleFonts.montserrat(
               fontWeight: FontWeight.w400, fontSize: 14, color: darkgrey),
           validator: (text) {
-            try {
-              text!.isValidNumber();
-              return null;
-            } catch (e) {
-              if (e is NumberTooShortException) {
-                if (text!.number.isEmpty) {
-                  return '';
-                } else {
-                  return 'Number too Short';
-                }
-              } else if (e is NumberTooLongException) {
-                return 'Number too Long';
-              } else {
-                return 'Enter Valid Phone Number';
-              }
-            }
+            return null;
           },
         ),
       ],

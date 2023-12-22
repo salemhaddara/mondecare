@@ -157,7 +157,7 @@ class _loginState extends State<login> {
       margin: const EdgeInsets.only(top: 26, bottom: 10),
       constraints: const BoxConstraints(maxWidth: 600),
       child: text400normal(
-        data: 'Email Address',
+        data: 'Email Address or UserName',
         textColor: darkgrey,
         fontsize: size.height * 0.017,
         align: TextAlign.start,
@@ -171,11 +171,14 @@ class _loginState extends State<login> {
         return InputField(
           hint: '',
           isPassword: false,
-          validator: (password) {
-            if (password!.isEmpty) {
+          validator: (email) {
+            if (email!.isEmpty) {
               return null;
             }
-            if (!isValidEmail(password)) {
+            if (email.isNotEmpty && email.length < 3) {
+              return 'UserName Must be more than 3 characters';
+            }
+            if (email.length > 8 && !isValidEmail(email)) {
               return 'Enter A Valid Email';
             }
             return null;

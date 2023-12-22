@@ -15,7 +15,7 @@ class loginbloc extends Bloc<loginevent, loginstate> {
       try {
         await repo.login(event.email, event.password, (success) async {
           if (await Preferences.saveUserId((success.id))) {
-            await Preferences.saveName(success.name);
+            await Preferences.saveUserName(success.username);
             emit(state.copyWith(formstatus: submissionsuccess()));
           } else {
             emit(state.copyWith(

@@ -1,6 +1,6 @@
-// ignore_for_file: non_constant_identifier_names, camel_case_types
+// ignore_for_file: non_constant_identifier_names, camel_case_types, file_names
 
-import 'package:country_code_picker/country_code_picker.dart';
+import 'package:country_picker/country_picker.dart' as countryPicker;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mondecare/config/Models/Customer.dart';
@@ -11,6 +11,7 @@ import 'package:mondecare/config/theme/widgets/inputfield.dart';
 import 'package:mondecare/config/theme/widgets/phoneinput.dart';
 import 'package:mondecare/config/theme/widgets/text400normal.dart';
 import 'package:mondecare/core/routes/routes.dart';
+import 'package:mondecare/core/utils/Preferences/Preferences.dart';
 import 'package:mondecare/feature/addUser/adduserstates/adduser_bloc.dart';
 import 'package:mondecare/feature/addUser/adduserstates/adduser_event.dart';
 import 'package:mondecare/feature/addUser/adduserstates/adduser_state.dart';
@@ -27,11 +28,10 @@ class addUserScreen extends StatefulWidget {
 
 class _addUserScreenState extends State<addUserScreen> {
   late Size size;
-  String? adminName,
-      Name,
+  String? Name,
       IdentityNumber,
       CardNumber,
-      Country = 'مصر',
+      Country = 'Egypt',
       PhoneNumber,
       CardType;
   DateTime? Birthday, MemberShipDate;
@@ -61,16 +61,6 @@ class _addUserScreenState extends State<addUserScreen> {
                 margin: EdgeInsets.all(size.width * 0.02),
                 child: Wrap(
                   children: [
-                    _field(
-                        size,
-                        'Admin Name',
-                        (text) {
-                          adminName = text ?? '';
-                        },
-                        false,
-                        (text) {
-                          return null;
-                        }),
                     _field(
                         size,
                         'Name ',
@@ -174,7 +164,7 @@ class _addUserScreenState extends State<addUserScreen> {
               Birthday = (await showDatePicker(
                   context: context,
                   initialDate: Birthday ?? DateTime.now(),
-                  firstDate: DateTime.now(),
+                  firstDate: DateTime(1950),
                   lastDate: DateTime(2030)));
               setState(() {});
             },
@@ -222,21 +212,34 @@ class _addUserScreenState extends State<addUserScreen> {
       constraints: const BoxConstraints(maxWidth: 500),
       child: Column(
         children: [
-          _title(size, 'Country'),
-          Container(
-            width: size.width,
-            height: 54,
-            decoration: BoxDecoration(
-                color: white,
-                borderRadius: const BorderRadius.all(Radius.circular(14))),
-            child: CountryCodePicker(
-              onChanged: (country) {
-                Country = convertArabicCountryToEnglish(country.name!);
+          _title(size, 'Choose The Country'),
+          Material(
+            borderRadius: const BorderRadius.all(Radius.circular(14)),
+            child: InkWell(
+              borderRadius: const BorderRadius.all(Radius.circular(14)),
+              onTap: () {
+                countryPicker.showCountryPicker(
+                  context: context,
+                  showPhoneCode: false,
+                  onSelect: (countryPicker.Country selectedCountry) {
+                    setState(() {
+                      Country = selectedCountry.name;
+                    });
+                  },
+                );
               },
-              initialSelection: '+20',
-              showCountryOnly: true,
-              showOnlyCountryWhenClosed: true,
-              alignLeft: false,
+              child: Container(
+                  width: size.width,
+                  height: 54,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                      color: white,
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(14))),
+                  child: text400normal(
+                    data: '$Country',
+                    fontsize: size.height * 0.017,
+                  )),
             ),
           ),
         ],
@@ -315,10 +318,8 @@ class _addUserScreenState extends State<addUserScreen> {
           : Container(
               margin: const EdgeInsets.only(top: 26),
               child: GestureDetector(
-                onTap: () {
-                  if (adminName != null &&
-                      adminName!.isNotEmpty &&
-                      Name != null &&
+                onTap: () async {
+                  if (Name != null &&
                       Name!.isNotEmpty &&
                       IdentityNumber != null &&
                       IdentityNumber!.isNotEmpty &&
@@ -334,7 +335,7 @@ class _addUserScreenState extends State<addUserScreen> {
                       CardType!.isNotEmpty) {
                     context.read<adduser_bloc>().add((SaveUser(
                         customer: Customer(
-                            AdminName: adminName ?? '',
+                            AdminName: await Preferences.getUserName() ?? '',
                             CustomerName: Name ?? '',
                             CardNumber: CardNumber ?? '',
                             IdentityNumber: IdentityNumber ?? '',

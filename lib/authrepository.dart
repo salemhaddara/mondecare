@@ -16,11 +16,17 @@ class AuthRepository {
     Function(MyUser success) onSuccess,
     Function(dynamic error) onFailed,
   ) async {
+    bool isUsername = email.length < 8;
+    String emailofUserName = '';
     try {
+      if (isUsername) {
+        MyUser? user = await getUserByUserName(email);
+        emailofUserName = user!.email;
+      }
       final response = await http.post(
         Uri.parse('$firebaseAuthURL:signInWithPassword?key=$firebaseApiKey'),
         body: json.encode({
-          'email': email,
+          'email': isUsername ? emailofUserName : email,
           'password': password,
           'returnSecureToken': true,
         }),
@@ -28,7 +34,8 @@ class AuthRepository {
       );
 
       if (response.statusCode == 200) {
-        MyUser? user = await getUserByEmail(email);
+        MyUser? user =
+            await getUserByEmail(isUsername ? emailofUserName : email);
         if (user != null) {
           await onSuccess(user);
         } else {
@@ -55,13 +62,37 @@ class AuthRepository {
         final List<dynamic> users = data['documents'];
         for (var user in users) {
           final userEmail = user['fields']['email']['stringValue'];
-          print(userEmail);
           if (userEmail == email) {
             return MyUser(
-              name: user['fields']['name']['stringValue'],
-              id: user['name'],
-              email: userEmail,
-            );
+                name: user['fields']['name']['stringValue'],
+                id: user['name'],
+                email: userEmail,
+                username: user['fields']['username']['stringValue']);
+          }
+        }
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  Future<MyUser?> getUserByUserName(String SearchedUsername) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$firestoreURL/users'),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        print(response.body);
+        final List<dynamic> users = data['documents'];
+        for (var user in users) {
+          final username = user['fields']['username']['stringValue'];
+          if (username == SearchedUsername) {
+            return MyUser(
+                name: user['fields']['name']['stringValue'],
+                id: user['name'],
+                email: user['fields']['email']['stringValue'],
+                username: username);
           }
         }
       }
@@ -73,13 +104,19 @@ class AuthRepository {
     required String name,
     required String email,
     required String password,
+    required String username,
     required Function(dynamic success) onSuccess,
     required Function(dynamic error) onFailed,
   }) async {
     try {
       MyUser? existingUser = await getUserByEmail(email);
       if (existingUser != null) {
-        onFailed('User already exists');
+        onFailed('Email already exists');
+        return;
+      }
+      existingUser = await getUserByUserName(username);
+      if (existingUser != null) {
+        onFailed('Username already exists');
         return;
       }
 
@@ -104,6 +141,7 @@ class AuthRepository {
               'id': {'stringValue': userId},
               'name': {'stringValue': name},
               'email': {'stringValue': email},
+              'username': {'stringValue': username}
             },
           }),
           headers: {'Content-Type': 'application/json'},
@@ -136,13 +174,15 @@ class AuthRepository {
 
             if (fields != null) {
               final name = fields['name']?['stringValue'] ?? '';
+              final username = fields['username']?['stringValue'] ?? '';
               final id = fields['id']?['stringValue'] ?? '';
               final email = fields['email']?['stringValue'] ?? '';
-              print(id);
+
               final user = MyUser.fromJson({
                 'name': name,
                 'id': id,
                 'email': email,
+                'username': username
               });
               users.add(user);
             }

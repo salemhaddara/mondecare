@@ -1,3 +1,5 @@
+// ignore_for_file: camel_case_types
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mondecare/authrepository.dart';
 import 'package:mondecare/feature/signup/signupstates/signupevent.dart';
@@ -14,6 +16,7 @@ class signupbloc extends Bloc<signupevent, signupstate> {
           name: event.name,
           email: event.email,
           password: event.password,
+          username: event.username,
           onFailed: (message) {
             emit(state.copyWith(formstatus: signupsubmissionfailed(message)));
           },
