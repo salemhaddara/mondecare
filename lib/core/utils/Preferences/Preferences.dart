@@ -56,8 +56,8 @@ class Preferences {
 
 //   //----------------------------------------------------------------------------------------------
 // //Delete Saved Data
-//   static Future<bool> deleteSavedData() async {
-//     final SharedPreferences prefs = await SharedPreferences.getInstance();
-//     return await prefs.clear();
-//   }
+  static Future<bool> deleteSavedData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return await prefs.clear();
+  }
 }

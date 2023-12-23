@@ -1,4 +1,4 @@
-// ignore_for_file: camel_case_types, use_build_context_synchronously, non_constant_identifier_names
+// ignore_for_file: camel_case_types, use_build_context_synchronously, non_constant_identifier_names, file_names
 
 // import 'dart:html' as html;
 import 'dart:io';
@@ -82,15 +82,113 @@ class _deleteUserScreenState extends State<deleteUserScreen> {
                 (state.statusTracker as SearchedNumberDeleted).message),
           ],
         );
+      } else if (state.statusTracker is FoundSearchedNumber) {
+        return _memberCardInfo(size, (state.searchedNumberData) ?? {}, context);
       } else if (state.statusTracker is Searching) {
         return Center(child: _searchingWidget(size));
       } else if (state.statusTracker is NotFoundSearchedNUmber) {
-        print((state.statusTracker as NotFoundSearchedNUmber).exception);
         return _NotFoundWidget(size);
       } else {
         return Container();
       }
     });
+  }
+
+  _deleteUserButton(
+    Size size,
+    BuildContext context,
+    Map<String, dynamic> usedata,
+  ) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+      constraints: const BoxConstraints(maxWidth: 500),
+      child: Column(
+        children: [
+          InkWell(
+            onTap: () async {
+              context.read<deletebloc>().add(deleteUser(usedata));
+            },
+            child: Container(
+              alignment: Alignment.center,
+              width: size.width,
+              decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(14)),
+                  color: darkred),
+              constraints: const BoxConstraints(minHeight: 54, maxWidth: 500),
+              child: text400normal(
+                data: 'Delete User',
+                align: TextAlign.center,
+                fontsize: size.height * 0.017,
+                fontWeight: FontWeight.w600,
+                textColor: white,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  _memberCardInfo(
+      Size size, Map<String, dynamic> usedata, BuildContext context) {
+    return Material(
+      elevation: 4,
+      borderRadius: const BorderRadius.all(Radius.circular(14)),
+      child: Container(
+        margin: const EdgeInsets.all(10),
+        child: Wrap(
+          children: [
+            _field(size, 'Name ',
+                usedata['fields']['CustomerName']['stringValue']),
+            _field(size, 'Identity Number',
+                usedata['fields']['IdentityNumber']['stringValue']),
+            _field(size, 'Card Number',
+                usedata['fields']['CardNumber']['stringValue']),
+            _deleteUserButton(size, context, usedata)
+          ],
+        ),
+      ),
+    );
+  }
+
+  _field(Size size, String fieldTitle, String data) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+      constraints: const BoxConstraints(maxWidth: 500),
+      child: Column(
+        children: [
+          _title(size, fieldTitle),
+          Container(
+            alignment: Alignment.center,
+            width: size.width,
+            decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(14)),
+                color: white),
+            constraints: const BoxConstraints(minHeight: 54, maxWidth: 500),
+            child: text400normal(
+              data: data,
+              align: TextAlign.center,
+              fontsize: size.height * 0.017,
+              fontWeight: FontWeight.w600,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _title(Size size, String title) {
+    return Container(
+      width: size.width,
+      margin: const EdgeInsets.only(bottom: 10),
+      constraints: const BoxConstraints(maxWidth: 600),
+      child: text400normal(
+        data: title,
+        textColor: darkgrey,
+        fontsize: size.height * 0.017,
+        align: TextAlign.start,
+      ),
+    );
   }
 
   _deleteSuccess(String message) {
@@ -162,7 +260,7 @@ class _deleteUserScreenState extends State<deleteUserScreen> {
           if (SearchedNumber != null && SearchedNumber!.length > 5) {
             context
                 .read<deletebloc>()
-                .add(deleteUser(searchedNumber: SearchedNumber ?? ''));
+                .add(searchUser(searchedNumber: SearchedNumber ?? ''));
           } else {
             ScaffoldMessenger.of(context).showSnackBar(showSnackbar(
               'Enter A Valid Card Number (>5)',

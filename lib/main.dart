@@ -13,7 +13,6 @@ import 'package:mondecare/feature/logs/logsStates/Repo/logsrepository.dart';
 import 'package:mondecare/feature/searchUser/searchUserScreen.dart';
 import 'package:mondecare/feature/searchUser/searchbloc/Repository/searchRepository.dart';
 import 'package:mondecare/feature/signup/signup.dart';
-import 'package:mondecare/feature/splash/splash.dart';
 // import 'package:mondecare/feature/splash/splash.dart';
 import 'package:mondecare/usercontrolrepository.dart';
 
@@ -37,7 +36,7 @@ Future<void> main() async {
       ),
     ],
     child: MaterialApp(
-      home: const splash(),
+      home: const home(),
       debugShowCheckedModeBanner: false,
       routes: {
         loginscreenRoute: (context) => const login(),

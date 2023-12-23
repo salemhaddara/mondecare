@@ -11,20 +11,35 @@ class deletebloc extends Bloc<deleteevent, deletestate> {
 
   deletebloc(this.repo)
       : super(deletestate(statusTracker: WaitingTheFirstDelete())) {
-    on<deleteUser>(
+    on<searchUser>(
       (event, emit) async {
         emit(deletestate(statusTracker: Searching()));
-
-        if (await repo.deleteUser(event.searchedNumber, (onfailed) {
+        var response =
+            (await repo.searchUsertoDelete(event.searchedNumber, (onfailed) {
           emit(deletestate(
             statusTracker: NotFoundSearchedNUmber(onfailed),
           ));
-        })) {
+        }));
+        if (response['status'] == 'success') {
           emit(deletestate(
             searchedNumber: event.searchedNumber,
-            statusTracker: SearchedNumberDeleted(
-                'User Deleted with Card Number : \n ${event.searchedNumber},'),
+            statusTracker: FoundSearchedNumber(),
+            searchedNumberData: response['data'],
           ));
+        }
+      },
+    );
+    on<deleteUser>(
+      (event, emit) async {
+        var response = await repo.deleteUser(event.userData);
+        print(response);
+        if (response['status'] != 'success') {
+          emit(deletestate(
+              statusTracker: NotFoundSearchedNUmber('Failed Try Again Later')));
+        } else {
+          emit(deletestate(
+              statusTracker: SearchedNumberDeleted(
+                  'Delete Success for card with Number : ${event.userData['fields']['CardNumber']['stringValue']}')));
         }
       },
     );

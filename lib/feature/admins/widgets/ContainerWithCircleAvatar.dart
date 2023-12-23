@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable,file_names
+// ignore_for_file: must_be_immutable,file_names, non_constant_identifier_names
 
 import 'package:flutter/material.dart';
 import 'package:mondecare/config/theme/colors.dart';
@@ -8,13 +8,15 @@ import 'package:mondecare/config/theme/widgets/text400normal.dart';
 class ContainerWithCircleAvatar extends StatelessWidget {
   String name, username, email, id;
   double fontsize;
+  Function(String) OnDeleteClick;
   ContainerWithCircleAvatar(
       {super.key,
       required this.name,
       required this.email,
       required this.username,
       required this.id,
-      required this.fontsize});
+      required this.fontsize,
+      required this.OnDeleteClick});
 
   bool isPermitted = false;
 
@@ -75,7 +77,7 @@ class ContainerWithCircleAvatar extends StatelessWidget {
                       child: InkWell(
                         onTap: () {
                           if (isPermitted) {
-                            print('delete Clicked');
+                            OnDeleteClick(username);
                           }
                         },
                         borderRadius:

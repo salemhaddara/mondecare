@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:mondecare/config/Models/MyUser.dart';
 
@@ -9,7 +10,7 @@ class AuthRepository {
       'https://identitytoolkit.googleapis.com/v1/accounts';
   static const String firestoreURL =
       'https://firestore.googleapis.com/v1/projects/mondecare-3b42f/databases/(default)/documents';
-
+  static const String domainName = 'https://firestore.googleapis.com/v1/';
   Future<void> login(
     String email,
     String password,
@@ -21,7 +22,11 @@ class AuthRepository {
     try {
       if (isUsername) {
         MyUser? user = await getUserByUserName(email);
-        emailofUserName = user!.email;
+        if (user != null) {
+          emailofUserName = user.email;
+        } else {
+          await onFailed('User Not Found');
+        }
       }
       final response = await http.post(
         Uri.parse('$firebaseAuthURL:signInWithPassword?key=$firebaseApiKey'),
@@ -44,6 +49,8 @@ class AuthRepository {
       } else {
         await onFailed(json.decode(response.body)['error']['message']);
       }
+    } on SocketException {
+      await onFailed('Check Your internet Connection');
     } catch (e) {
       print(e.toString());
       await onFailed('Error: $e');
@@ -75,6 +82,34 @@ class AuthRepository {
     return null;
   }
 
+  Future<Map<String, dynamic>?> getUserByUserNameMapReturn(
+      String SearchedUsername) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$firestoreURL/users'),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final List<dynamic> users = data['documents'];
+        for (var user in users) {
+          final username = user['fields']['username']['stringValue'];
+          if (username == SearchedUsername) {
+            return {
+              'user': MyUser(
+                  name: user['fields']['name']['stringValue'],
+                  id: user['fields']['id']['stringValue'],
+                  email: user['fields']['email']['stringValue'],
+                  username: username),
+              'ref': user['name']
+            };
+          }
+        }
+      }
+    } catch (e) {}
+    return null;
+  }
+
   Future<MyUser?> getUserByUserName(String SearchedUsername) async {
     try {
       final response = await http.get(
@@ -83,7 +118,6 @@ class AuthRepository {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        print(response.body);
         final List<dynamic> users = data['documents'];
         for (var user in users) {
           final username = user['fields']['username']['stringValue'];
@@ -149,8 +183,10 @@ class AuthRepository {
 
         onSuccess({'success': true, 'message': 'User Registered Successfully'});
       } else {
-        onFailed(json.decode(response.body));
+        onFailed(json.decode(response.body)['error']['message']);
       }
+    } on SocketException {
+      onFailed('Check Your Ineternet Connection');
     } catch (e) {
       onFailed('Error: $e');
     }
@@ -196,5 +232,31 @@ class AuthRepository {
     } catch (e) {
       return [];
     }
+  }
+
+  Future<bool> deleteUser(String username) async {
+    try {
+      // Fetch user details and document reference from Firestore
+      Map<String, dynamic>? userResponse =
+          await getUserByUserNameMapReturn(username);
+      if (userResponse != null) {
+        String documentReference = userResponse['ref'];
+        final firestoreDeleteResponse = await http.delete(
+          Uri.parse('$domainName$documentReference'),
+          headers: {'Content-Type': 'application/json'},
+        );
+        print(Uri.parse('$domainName$documentReference'));
+        print(firestoreDeleteResponse.body);
+
+        if (firestoreDeleteResponse.statusCode == 200) {
+          return true;
+        }
+      }
+    } on SocketException {
+      print('Internet Connection Error');
+    } catch (e) {
+      print('Error deleting user: $e');
+    }
+    return false;
   }
 }

@@ -6,9 +6,12 @@ import 'package:mondecare/authrepository.dart';
 import 'package:mondecare/config/theme/colors.dart';
 import 'package:mondecare/config/theme/widgets/drawer.dart';
 import 'package:mondecare/config/theme/widgets/text400normal.dart';
+import 'package:mondecare/core/routes/routes.dart';
+import 'package:mondecare/core/utils/Preferences/Preferences.dart';
 import 'package:mondecare/feature/admins/adminsStates/adminsbloc.dart';
 import 'package:mondecare/feature/admins/adminsStates/adminsevent.dart';
 import 'package:mondecare/feature/admins/adminsStates/adminsstate.dart';
+import 'package:mondecare/feature/admins/deleteAdminTracker/deleteTracker.dart';
 import 'package:mondecare/feature/admins/widgets/ContainerWithCircleAvatar.dart';
 
 class AllUsersScreen extends StatefulWidget {
@@ -49,6 +52,9 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
                       Expanded(
                         child: BlocBuilder<adminsbloc, adminsstate>(
                           builder: (context, state) {
+                            if (state.tracker is deleteSuccess) {
+                              _return_toInitial(context);
+                            }
                             if (state.users.isEmpty) {
                               return Container(
                                 width: size.width * 0.2,
@@ -74,6 +80,11 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
                                         username: state.users[index].username,
                                         id: state.users[index].id,
                                         fontsize: size.width * 0.026,
+                                        OnDeleteClick: (username) {
+                                          context
+                                              .read<adminsbloc>()
+                                              .add(deleteAdmin(username));
+                                        },
                                       );
                                     }));
                           },
@@ -84,6 +95,14 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
             }),
           ),
         ));
+  }
+
+  _return_toInitial(BuildContext context) async {
+    if ((await Preferences.getUserName()) != null) {
+      context.read<adminsbloc>().add(requestUsers());
+    } else {
+      Navigator.pushReplacementNamed(context, loginscreenRoute);
+    }
   }
 
   _homeTitle(Size size) {

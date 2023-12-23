@@ -143,9 +143,10 @@ class _loginState extends State<login> {
         width: size.width,
         height: 50,
         alignment: Alignment.center,
+        margin: const EdgeInsets.all(10),
         child: text400normal(
           data: 'Sign In',
-          fontsize: size.height * 0.04,
+          fontsize: size.height * 0.035,
           fontWeight: FontWeight.w600,
           textColor: darkgrey,
         ));

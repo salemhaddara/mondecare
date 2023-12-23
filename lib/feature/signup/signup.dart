@@ -155,7 +155,7 @@ class _signupState extends State<signup> {
         ),
         child: text400normal(
           data: 'Sign Up',
-          fontsize: size.height * 0.04,
+          fontsize: size.height * 0.035,
           textColor: darkgrey,
           fontWeight: FontWeight.w600,
           align: TextAlign.center,
@@ -213,7 +213,7 @@ class _signupState extends State<signup> {
       child: text400normal(
         data: 'UserName',
         textColor: darkgrey,
-        fontsize: size.height * 0.017,
+        fontsize: size.height * 0.013,
       ),
     );
   }
@@ -246,7 +246,7 @@ class _signupState extends State<signup> {
       child: text400normal(
         data: 'Email Address',
         textColor: darkgrey,
-        fontsize: size.height * 0.017,
+        fontsize: size.height * 0.013,
       ),
     );
   }
@@ -395,7 +395,7 @@ class _signupState extends State<signup> {
       child: text400normal(
         data: 'Password',
         textColor: darkgrey,
-        fontsize: size.height * 0.017,
+        fontsize: size.height * 0.013,
       ),
     );
   }

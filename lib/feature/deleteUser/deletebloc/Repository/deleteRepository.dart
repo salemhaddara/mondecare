@@ -12,7 +12,25 @@ class deleteRepository {
   static const String firestoreURL =
       'https://firestore.googleapis.com/v1/projects/mondecare-3b42f/databases/(default)/documents';
 
-  Future<bool> deleteUser(String cardNumber, Function(String) onFailed) async {
+  Future<Map<String, dynamic>> deleteUser(
+      Map<String, dynamic> userEntry) async {
+    try {
+      final documentId = userEntry['name'].split('/').last;
+      final deleteResponse =
+          await http.delete(Uri.parse('$firestoreURL/customers/$documentId'));
+
+      if (deleteResponse.statusCode == 200) {
+        return {'status': 'success', 'message': 'Deleted user successfully'};
+      } else {
+        return {'status': 'error', 'message': 'Failed to delete user'};
+      }
+    } catch (e) {
+      return {'status': 'error', 'message': 'Failed to delete user'};
+    }
+  }
+
+  Future<Map<String, dynamic>> searchUsertoDelete(
+      String cardNumber, Function(String) onFailed) async {
     try {
       final response = await http.get(Uri.parse('$firestoreURL/customers'));
       if (response.statusCode == 200) {
@@ -29,32 +47,22 @@ class deleteRepository {
           );
 
           if (userEntry != null) {
-            final documentId = userEntry['name'].split('/').last;
-            final deleteResponse = await http
-                .delete(Uri.parse('$firestoreURL/customers/$documentId'));
-
-            if (deleteResponse.statusCode == 200) {
-              print('Deleted user successfully');
-              return true;
-            } else {
-              onFailed('Failed to delete user');
-              return false;
-            }
+            return {'status': 'success', 'data': userEntry};
           } else {
             onFailed('No Users Found With This Card Number');
-            return false;
+            return {'status': 'error'};
           }
         } else {
           onFailed('No documents found');
-          return false;
+          return {'status': 'error'};
         }
       } else {
         onFailed('Failed to fetch data');
-        return false;
+        return {'status': 'error'};
       }
     } catch (e) {
       onFailed(e.toString());
-      return false;
+      return {'status': 'error'};
     }
   }
 }

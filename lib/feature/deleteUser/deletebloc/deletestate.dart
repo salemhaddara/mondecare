@@ -5,8 +5,9 @@ import 'package:mondecare/feature/deleteUser/deletebloc/searchStateTracker/delet
 class deletestate {
   String searchedNumber;
   deleteStatusTracker statusTracker;
-  deletestate({
-    this.searchedNumber = '',
-    required this.statusTracker,
-  });
+  Map<String, dynamic>? searchedNumberData = {};
+  deletestate(
+      {this.searchedNumber = '',
+      required this.statusTracker,
+      this.searchedNumberData});
 }

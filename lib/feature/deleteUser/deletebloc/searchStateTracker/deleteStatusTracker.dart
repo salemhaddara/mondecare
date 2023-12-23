@@ -11,6 +11,8 @@ class NotFoundSearchedNUmber extends deleteStatusTracker {
   NotFoundSearchedNUmber(this.exception);
 }
 
+class FoundSearchedNumber extends deleteStatusTracker {}
+
 class SearchedNumberDeleted extends deleteStatusTracker {
   String message;
   SearchedNumberDeleted(this.message);

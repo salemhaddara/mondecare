@@ -5,3 +5,8 @@ abstract class adminsevent {}
 class requestUsers extends adminsevent {
   requestUsers();
 }
+
+class deleteAdmin extends adminsevent {
+  String username;
+  deleteAdmin(this.username);
+}
