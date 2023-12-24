@@ -77,7 +77,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
-    - assets/images/watermark.png
+    - assets/images/watermark.jpg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
@@ -95,7 +95,10 @@ flutter:
         - asset: assets/fonts/montaser.otf
     - family: eng
       fonts:
-        - asset: assets/fonts/artisticfont.ttf        
+        - asset: assets/fonts/artisticfont.ttf
+    - family: bolded
+      fonts:
+        - asset: assets/fonts/bolded.ttf        
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true

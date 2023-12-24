@@ -1,4 +1,4 @@
-// ignore_for_file: camel_case_types, use_build_context_synchronously, non_constant_identifier_names, prefer_typing_uninitialized_variables, file_names
+// ignore_for_file: camel_case_types, use_build_context_synchronously, non_constant_identifier_names, prefer_typing_uninitialized_variables, file_names, avoid_types_as_parameter_names
 
 // import 'dart:html' as html;
 import 'dart:io';
@@ -13,6 +13,7 @@ import 'package:mondecare/config/theme/widgets/Snackbar.dart';
 import 'package:mondecare/config/theme/widgets/drawer.dart';
 import 'package:mondecare/config/theme/widgets/searchbar.dart';
 import 'package:mondecare/config/theme/widgets/text400normal.dart';
+import 'package:mondecare/core/utils/Backend/Backend.dart';
 import 'package:mondecare/feature/searchUser/pdfConstruction/pdfConstructionconstantes.dart';
 import 'package:mondecare/feature/searchUser/searchbloc/Repository/searchRepository.dart';
 import 'package:mondecare/feature/searchUser/searchbloc/searchStateTracker/searchStatusTracker.dart';
@@ -166,33 +167,41 @@ class _searchUserScreenState extends State<searchUserScreen> {
 
   static pw.Widget _buildMemberInfo(
       Customer customer, PdfColor textColor, pw.Font font) {
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        pw.SizedBox(height: 10),
-        _buildInfoRow('Name:', customer.CustomerName, textColor, font),
-        pw.SizedBox(height: 5),
-        _buildInfoRow(
-            'Identity Number :', customer.IdentityNumber, textColor, font),
-        pw.SizedBox(height: 5),
-        _buildInfoRow('Phone Number :', customer.PhoneNumber, textColor, font),
-        pw.SizedBox(height: 5),
-        _buildInfoRow('Country  :', customer.Country, textColor, font),
-        pw.SizedBox(height: 5),
-        _buildInfoRow(
-            'Birthday  :',
-            '${customer.Birthday.day}/${customer.Birthday.month}/${customer.Birthday.year}',
-            textColor,
-            font),
-        pw.SizedBox(height: 5),
-        _buildInfoRow(
-            'MemberShip Date :',
-            ' ${customer.MemberShipDate.day}/${customer.MemberShipDate.month}/${customer.MemberShipDate.year}',
-            textColor,
-            font),
-        pw.SizedBox(height: 5),
-      ],
-    );
+    return pw.Container(
+        decoration: pw.BoxDecoration(
+          borderRadius: const pw.BorderRadius.all(pw.Radius.circular(14)),
+          border: pw.Border.all(width: 5, color: PdfColor.fromHex('#A37E2C')),
+        ),
+        padding: const pw.EdgeInsets.all(16),
+        margin: const pw.EdgeInsets.symmetric(vertical: 16),
+        child: pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.SizedBox(height: 5),
+            _buildInfoRow('Name:', customer.CustomerName, textColor, font),
+            pw.SizedBox(height: 5),
+            _buildInfoRow(
+                'Identity Number :', customer.IdentityNumber, textColor, font),
+            pw.SizedBox(height: 5),
+            _buildInfoRow(
+                'Phone Number :', customer.PhoneNumber, textColor, font),
+            pw.SizedBox(height: 5),
+            _buildInfoRow('Country  :', customer.Country, textColor, font),
+            pw.SizedBox(height: 5),
+            _buildInfoRow(
+                'Birthday  :',
+                '${customer.Birthday.day}/${customer.Birthday.month}/${customer.Birthday.year}',
+                textColor,
+                font),
+            pw.SizedBox(height: 5),
+            _buildInfoRow(
+                'MemberShip Date :',
+                ' ${customer.MemberShipDate.day}/${customer.MemberShipDate.month}/${customer.MemberShipDate.year}',
+                textColor,
+                font),
+            pw.SizedBox(height: 5),
+          ],
+        ));
   }
 
   static pw.Widget _buildInfoRow(
@@ -320,19 +329,33 @@ class _searchUserScreenState extends State<searchUserScreen> {
   _ss(BuildContext pagecontext, Customer customer, bool WithDownload) async {
     final pdf = pw.Document();
     final backgroundImage = pw.MemoryImage(
-      (await rootBundle.load('assets/images/watermark.png'))
+      (await rootBundle.load('assets/images/watermark.jpg'))
           .buffer
           .asUint8List(),
     );
+
     var data = await rootBundle.load("assets/fonts/artisticfont.ttf");
+    var numberfont = await rootBundle.load("assets/fonts/bolded.ttf");
     final ttf = pw.Font.ttf(data);
+    final ttfBolded = pw.Font.ttf(numberfont);
+    final Card = customer.CardType == Backend.CardTypeVIP
+        ? pw.MemoryImage(
+            (await rootBundle.load('assets/images/vip.png'))
+                .buffer
+                .asUint8List(),
+          )
+        : pw.MemoryImage(
+            (await rootBundle.load('assets/images/pearl.png'))
+                .buffer
+                .asUint8List(),
+          );
     pdf.addPage(pw.Page(
       pageFormat: PdfPageFormat.a4,
       margin: const pw.EdgeInsets.symmetric(horizontal: 0, vertical: 0),
       build: (pw.Context context) {
         return pw.Stack(children: [
           pw.Opacity(
-            opacity: 0.1,
+            opacity: 0.2,
             child: pw.Image(backgroundImage, fit: pw.BoxFit.cover),
           ),
           pw.Container(
@@ -348,18 +371,12 @@ class _searchUserScreenState extends State<searchUserScreen> {
                     height: 150,
                     child: pw.SvgImage(
                         svg: pdfConstruction.svgPicture, fit: pw.BoxFit.cover)),
-                _pdfDevider(),
-                _pdftext(24, 'MemberShip Card', true, true, ttf),
+                _pdftext(24, 'MEMBERSHIP CARD', true, true, ttf),
                 pw.SizedBox(height: 10),
                 _buildMemberInfo(customer, PdfColors.black, ttf),
                 pw.SizedBox(height: 10),
-                _pdfDevider(),
-                pw.SizedBox(height: 10),
-                _pdftext(20, 'Card Number', true, true, ttf),
-                _pdftext(28, customer.CardNumber, false, false, ttf),
-                _pdfDevider(),
-                _pdftext(20, 'Card Type', true, true, ttf),
-                _pdftext(28, customer.CardType, false, false, ttf)
+                pw.SizedBox(height: 30),
+                _cardAndNumber(customer, Card, ttfBolded)
               ],
             ),
           )
@@ -405,20 +422,35 @@ class _searchUserScreenState extends State<searchUserScreen> {
     }
   }
 
+  _cardAndNumber(Customer customer, var Card, var ttfBolded) {
+    return pw.Container(
+        height: 250,
+        width: 410,
+        alignment: pw.Alignment.center,
+        child: pw.Stack(
+          children: [
+            pw.Image(Card, fit: pw.BoxFit.cover),
+            pw.Align(
+                alignment: pw.Alignment.bottomLeft,
+                child: pw.Container(
+                    margin: const pw.EdgeInsets.all(16),
+                    child: pw.Text(
+                      customer.CardNumber,
+                      textAlign: pw.TextAlign.center,
+                      style: pw.TextStyle(
+                          color: PdfColors.black,
+                          fontSize: 16,
+                          font: ttfBolded),
+                    )))
+          ],
+        ));
+  }
+
   void openFile(String filePath) async {
     File file = File(filePath);
     if (await file.exists()) {
       await OpenFile.open(filePath);
-    } else {
-      print('File does not exist.');
     }
-  }
-
-  _pdfDevider() {
-    return pw.Container(
-        color: PdfColors.black,
-        height: 1,
-        margin: const pw.EdgeInsets.only(bottom: 5));
   }
 
   _pdftext(

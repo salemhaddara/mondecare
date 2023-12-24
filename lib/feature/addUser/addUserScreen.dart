@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names, camel_case_types, file_names
+// ignore_for_file: non_constant_identifier_names, camel_case_types, file_names, library_prefixes
 
 import 'package:country_picker/country_picker.dart' as countryPicker;
 import 'package:flutter/material.dart';
