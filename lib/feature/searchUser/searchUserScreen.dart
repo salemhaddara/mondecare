@@ -433,13 +433,13 @@ class _searchUserScreenState extends State<searchUserScreen> {
             pw.Align(
                 alignment: pw.Alignment.bottomLeft,
                 child: pw.Container(
-                    margin: const pw.EdgeInsets.all(16),
+                    margin: const pw.EdgeInsets.all(24),
                     child: pw.Text(
                       customer.CardNumber,
                       textAlign: pw.TextAlign.center,
                       style: pw.TextStyle(
                           color: PdfColors.black,
-                          fontSize: 16,
+                          fontSize: 20,
                           font: ttfBolded),
                     )))
           ],
