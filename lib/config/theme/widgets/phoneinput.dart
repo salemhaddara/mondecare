@@ -25,9 +25,10 @@ class _phoneinputState extends State<phoneinput> {
     return Stack(
       children: [
         Container(
-          height: 64,
+          height: 54,
           decoration: BoxDecoration(
               color: widget.color ?? white,
+              border: Border.all(width: 2, color: darkgrey),
               borderRadius: const BorderRadius.all(Radius.circular(13))),
         ),
         IntlPhoneField(
@@ -46,17 +47,21 @@ class _phoneinputState extends State<phoneinput> {
                   color: darkgrey, fontWeight: FontWeight.w500),
               countryNameStyle: GoogleFonts.montserrat(
                   color: darkgrey, fontWeight: FontWeight.w500)),
-          decoration: const InputDecoration(
-            errorBorder: OutlineInputBorder(
+          decoration: InputDecoration(
+            fillColor: white,
+            filled: false,
+            errorBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(13)),
                 borderSide: BorderSide(color: Colors.red)),
-            focusedBorder: OutlineInputBorder(
+            focusedBorder: const OutlineInputBorder(
               borderSide: BorderSide.none,
+              borderRadius: BorderRadius.all(Radius.circular(13)),
             ),
-            enabledBorder: OutlineInputBorder(
+            enabledBorder: const OutlineInputBorder(
               borderSide: BorderSide.none,
+              borderRadius: BorderRadius.all(Radius.circular(13)),
             ),
-            focusedErrorBorder: OutlineInputBorder(
+            focusedErrorBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(13)),
                 borderSide: BorderSide(color: Colors.red)),
           ),

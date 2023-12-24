@@ -104,6 +104,7 @@ class _deleteUserScreenState extends State<deleteUserScreen> {
       constraints: const BoxConstraints(maxWidth: 500),
       child: Column(
         children: [
+          _title(size, 'Click To delete User '),
           InkWell(
             onTap: () async {
               context.read<deletebloc>().add(deleteUser(usedata));

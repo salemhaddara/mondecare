@@ -425,7 +425,7 @@ class _searchUserScreenState extends State<searchUserScreen> {
   _cardAndNumber(Customer customer, var Card, var ttfBolded) {
     return pw.Container(
         height: 250,
-        width: 410,
+        width: 440,
         alignment: pw.Alignment.center,
         child: pw.Stack(
           children: [

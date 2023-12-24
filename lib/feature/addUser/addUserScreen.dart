@@ -100,12 +100,20 @@ class _addUserScreenState extends State<addUserScreen> {
                     _phoneNumber(size),
                     _datePickerBirthday(size, 'Birthday'),
                     _datePickerMembership(size, 'MemberShip Date'),
-                    ChoosePhotoWidget(
-                        imagePath1: 'assets/images/pearl.png',
-                        imagePath2: 'assets/images/vip.png',
-                        onImageSelected: (value) {
-                          CardType = value;
-                        }),
+                    Container(
+                      margin: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          _title(size, 'Choose Card Type'),
+                          ChoosePhotoWidget(
+                              imagePath1: 'assets/images/pearl.png',
+                              imagePath2: 'assets/images/vip.png',
+                              onImageSelected: (value) {
+                                CardType = value;
+                              }),
+                        ],
+                      ),
+                    ),
                     _signinButton(size, context),
                   ],
                 ),
@@ -134,6 +142,7 @@ class _addUserScreenState extends State<addUserScreen> {
               height: 54,
               width: double.infinity,
               decoration: BoxDecoration(
+                  border: Border.all(width: 2, color: darkgrey),
                   borderRadius: const BorderRadius.all(Radius.circular(14)),
                   color: white),
               constraints: const BoxConstraints(maxWidth: 600),
@@ -172,6 +181,7 @@ class _addUserScreenState extends State<addUserScreen> {
               height: 54,
               width: double.infinity,
               decoration: BoxDecoration(
+                  border: Border.all(width: 2, color: darkgrey),
                   borderRadius: const BorderRadius.all(Radius.circular(14)),
                   color: white),
               constraints: const BoxConstraints(maxWidth: 600),
@@ -234,6 +244,10 @@ class _addUserScreenState extends State<addUserScreen> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                       color: white,
+                      border: Border.all(
+                        color: darkgrey,
+                        width: 2,
+                      ),
                       borderRadius:
                           const BorderRadius.all(Radius.circular(14))),
                   child: text400normal(
@@ -308,6 +322,7 @@ class _addUserScreenState extends State<addUserScreen> {
       }
       return state.requestStatus is loadingrequest
           ? Container(
+              height: 54,
               margin: const EdgeInsets.only(top: 26),
               alignment: Alignment.center,
               child: CircularProgressIndicator(
@@ -316,6 +331,7 @@ class _addUserScreenState extends State<addUserScreen> {
               ),
             )
           : Container(
+              height: 54,
               margin: const EdgeInsets.only(top: 26),
               child: GestureDetector(
                 onTap: () async {
@@ -351,7 +367,7 @@ class _addUserScreenState extends State<addUserScreen> {
                   }
                 },
                 child: Container(
-                  height: size.height * 0.06,
+                  height: 54,
                   width: size.width,
                   margin: const EdgeInsets.symmetric(horizontal: 16),
                   constraints: const BoxConstraints(maxWidth: 500),

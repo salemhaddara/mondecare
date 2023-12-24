@@ -67,12 +67,12 @@ class _InputFieldState extends State<InputField> {
               errorBorder: OutlineInputBorder(
                   borderRadius: const BorderRadius.all(Radius.circular(13)),
                   borderSide: BorderSide(color: darkred)),
-              focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide.none,
-                  borderRadius: BorderRadius.all(Radius.circular(13))),
-              enabledBorder: const OutlineInputBorder(
-                  borderSide: BorderSide.none,
-                  borderRadius: BorderRadius.all(Radius.circular(13))),
+              focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: darkgrey, width: 2),
+                  borderRadius: const BorderRadius.all(Radius.circular(13))),
+              enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: darkgrey, width: 2),
+                  borderRadius: const BorderRadius.all(Radius.circular(13))),
               focusedErrorBorder: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(13)),
                   borderSide: BorderSide(color: Colors.red)),

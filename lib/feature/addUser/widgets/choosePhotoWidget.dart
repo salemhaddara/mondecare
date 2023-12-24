@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:mondecare/config/theme/colors.dart';
 import 'package:mondecare/core/utils/Backend/Backend.dart';
@@ -29,7 +31,7 @@ class _ChoosePhotoWidgetState extends State<ChoosePhotoWidget> {
     return Container(
       height: 54,
       constraints: const BoxConstraints(maxWidth: 500),
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
