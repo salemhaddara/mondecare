@@ -96,6 +96,7 @@ class _loginState extends State<login> {
                               children: [
                                 _SignInTitle(size),
                                 _form(size),
+                                _forgetPassword(size),
                                 _signinButton(size, context),
                                 _donthaveaccount(size)
                               ],
@@ -160,6 +161,19 @@ class _loginState extends State<login> {
         textColor: darkgrey,
         fontsize: size.height * 0.017,
         align: TextAlign.start,
+      ),
+    );
+  }
+
+  Widget _forgetPassword(Size size) {
+    return Container(
+      width: size.width,
+      constraints: const BoxConstraints(maxWidth: 600),
+      child: text400normal(
+        data: 'Forget Password',
+        textColor: darkgrey,
+        fontsize: size.height * 0.017,
+        align: TextAlign.end,
       ),
     );
   }

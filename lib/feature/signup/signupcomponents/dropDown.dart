@@ -11,10 +11,13 @@ class questionsdropDownMenu extends StatefulWidget {
 }
 
 class _questionsdropDownMenuState extends State<questionsdropDownMenu> {
-  String _selectedItem = 'Option 1'; // Default selected item
-
+  String _selectedItem = 'What is the name of your BestFriend ?';
   // List of items for the dropdown menu
-  final List<String> _dropdownItems = ['Option 1', 'Option 2', 'Option 3'];
+  final List<String> _dropdownItems = [
+    'What is the name of your BestFriend ?',
+    'What is your favorite color ?',
+    'What is your favorite fruit ?'
+  ];
 
   @override
   Widget build(BuildContext context) {

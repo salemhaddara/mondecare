@@ -154,7 +154,6 @@ class AuthRepository {
         Uri.parse('$firestoreURL/users'),
       );
       final List<MyUser> users = [];
-      print(response.body);
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
 
