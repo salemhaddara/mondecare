@@ -6,15 +6,15 @@ import 'package:mondecare/config/theme/widgets/inputfield.dart';
 import 'package:mondecare/config/theme/widgets/text400normal.dart';
 
 class ContainerWithCircleAvatar extends StatelessWidget {
-  String name, username, email, id;
+  String name, username, country, phoneNumber;
   double fontsize;
   Function(String) OnDeleteClick;
   ContainerWithCircleAvatar(
       {super.key,
       required this.name,
-      required this.email,
+      required this.country,
       required this.username,
-      required this.id,
+      required this.phoneNumber,
       required this.fontsize,
       required this.OnDeleteClick});
 
@@ -37,25 +37,34 @@ class ContainerWithCircleAvatar extends StatelessWidget {
           padding: const EdgeInsets.all(10.0),
           child: Row(
             children: [
-              const CircleAvatar(
-                radius: 30.0,
-                backgroundImage: AssetImage('assets/images/person.png'),
+              Expanded(
+                flex: 1,
+                child: Container(
+                  alignment: Alignment.center,
+                  child: Image.asset('assets/images/user.png'),
+                ),
               ),
               const SizedBox(width: 20.0),
               Expanded(
+                flex: 4,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     text400normal(
-                      data: 'Name : $name',
+                      data: name,
                       fontsize: fontsize,
+                      fontWeight: FontWeight.w600,
                     ),
                     text400normal(
-                      data: 'Email : $email',
+                      data: 'From : $country',
                       fontsize: fontsize,
                     ),
                     text400normal(
                       data: 'Username : $username',
+                      fontsize: fontsize,
+                    ),
+                    text400normal(
+                      data: 'Call me at $phoneNumber',
                       fontsize: fontsize,
                     ),
                     _field(size, 'Enter Your Key To Perform Actions',
@@ -122,6 +131,7 @@ class ContainerWithCircleAvatar extends StatelessWidget {
         children: [
           _title(size, fieldTitle),
           InputField(
+              icon: Icons.password_outlined,
               isPassword: false,
               hint: '',
               initialState: false,

@@ -25,8 +25,6 @@ class login extends StatefulWidget {
   State<login> createState() => _loginState();
 }
 
-bool thefirsttime = true;
-
 class _loginState extends State<login> {
   final formKey = GlobalKey<FormState>();
   String emailcheck = '', passwordcheck = '';
@@ -158,7 +156,7 @@ class _loginState extends State<login> {
       margin: const EdgeInsets.only(top: 26, bottom: 10),
       constraints: const BoxConstraints(maxWidth: 600),
       child: text400normal(
-        data: 'Email Address or UserName',
+        data: 'UserName',
         textColor: darkgrey,
         fontsize: size.height * 0.017,
         align: TextAlign.start,
@@ -172,6 +170,7 @@ class _loginState extends State<login> {
         return InputField(
           hint: '',
           isPassword: false,
+          icon: Icons.person,
           validator: (email) {
             if (email!.isEmpty) {
               return null;
@@ -212,6 +211,7 @@ class _loginState extends State<login> {
         return InputField(
           hint: '',
           isPassword: true,
+          icon: Icons.password_outlined,
           validator: (password) {
             if (password == null || password.isEmpty) {
               return null;

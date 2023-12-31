@@ -57,65 +57,87 @@ class _addUserScreenState extends State<addUserScreen> {
                 adduser_bloc(context.read<usercontrolrepository>()),
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              child: Container(
-                margin: EdgeInsets.all(size.width * 0.02),
-                child: Wrap(
-                  children: [
-                    _field(
-                        size,
-                        'Name ',
-                        (text) {
-                          Name = text ?? '';
-                        },
-                        false,
-                        (text) {
-                          return null;
-                        }),
-                    _field(
-                        size,
-                        'Identity Number',
-                        (text) {
-                          IdentityNumber = text ?? '';
-                        },
-                        false,
-                        (text) {
-                          return null;
-                        }),
-                    _field(
-                        size,
-                        'Card Number',
-                        (text) {
-                          CardNumber = text ?? '';
-                        },
-                        true,
-                        (text) {
-                          if (text != null &&
-                              text.isNotEmpty &&
-                              text.length < 16) {
-                            return 'Card Number Characters Must be =16';
-                          }
-                          return null;
-                        }),
-                    _countryChooser(size),
-                    _phoneNumber(size),
-                    _datePickerBirthday(size, 'Birthday'),
-                    _datePickerMembership(size, 'MemberShip Date'),
-                    Container(
-                      margin: const EdgeInsets.all(16),
-                      child: Column(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Container(
+                  margin: EdgeInsets.all(size.width * 0.02),
+                  alignment: Alignment.center,
+                  child: Column(
+                    children: [
+                      Wrap(
                         children: [
-                          _title(size, 'Choose Card Type'),
-                          ChoosePhotoWidget(
-                              imagePath1: 'assets/images/pearl.png',
-                              imagePath2: 'assets/images/vip.png',
-                              onImageSelected: (value) {
-                                CardType = value;
-                              }),
+                          _field(
+                              size,
+                              'Name ',
+                              (text) {
+                                Name = text ?? '';
+                              },
+                              false,
+                              (text) {
+                                return null;
+                              },
+                              Icons.person_2_outlined),
+                          _field(
+                              size,
+                              'Identity Number',
+                              (text) {
+                                IdentityNumber = text ?? '';
+                              },
+                              false,
+                              (text) {
+                                return null;
+                              },
+                              Icons.perm_identity),
+                          _field(
+                              size,
+                              'Card Number',
+                              (text) {
+                                CardNumber = text ?? '';
+                              },
+                              true,
+                              (text) {
+                                if (text != null &&
+                                    text.isNotEmpty &&
+                                    text.length < 16) {
+                                  return 'Card Number Characters Must be =16';
+                                }
+                                return null;
+                              },
+                              Icons.credit_card),
+                          _countryChooser(size),
+                          _phoneNumber(size),
+                          _datePickerBirthday(size, 'Birthday'),
+                          _datePickerMembership(size, 'MemberShip Date'),
                         ],
                       ),
-                    ),
-                    _signinButton(size, context),
-                  ],
+                      Container(
+                        margin: const EdgeInsets.all(16),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: size.width,
+                              margin: const EdgeInsets.only(bottom: 10),
+                              constraints: const BoxConstraints(maxWidth: 600),
+                              child: text400normal(
+                                data: 'Choose Card Type',
+                                textColor: darkgrey,
+                                fontsize: size.height * 0.017,
+                                align: TextAlign.center,
+                              ),
+                            ),
+                            ChoosePhotoWidget(
+                                imagePath1: 'assets/images/pearl.png',
+                                imagePath2: 'assets/images/vip.png',
+                                imagePath3: 'assets/images/pyramids.png',
+                                onImageSelected: (value) {
+                                  CardType = value;
+                                }),
+                          ],
+                        ),
+                      ),
+                      _signinButton(size, context),
+                    ],
+                  ),
                 ),
               ),
             )));
@@ -262,7 +284,7 @@ class _addUserScreenState extends State<addUserScreen> {
   }
 
   _field(Size size, String fieldTitle, Function(String?) onChanged,
-      bool isNumber, String? Function(String?) validator) {
+      bool isNumber, String? Function(String?) validator, IconData icondata) {
     return Container(
       margin: const EdgeInsets.all(16),
       constraints: const BoxConstraints(maxWidth: 500),
@@ -272,6 +294,7 @@ class _addUserScreenState extends State<addUserScreen> {
           InputField(
               isPassword: false,
               hint: '',
+              icon: icondata,
               initialState: false,
               isNumber: isNumber,
               validator: (text) {
@@ -370,7 +393,7 @@ class _addUserScreenState extends State<addUserScreen> {
                   height: 54,
                   width: size.width,
                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                  constraints: const BoxConstraints(maxWidth: 500),
+                  constraints: const BoxConstraints(maxWidth: 800),
                   decoration: BoxDecoration(
                       borderRadius: const BorderRadius.all(
                         Radius.circular(14),

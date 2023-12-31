@@ -1,4 +1,4 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, non_constant_identifier_names, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -75,10 +75,12 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
                                     physics: const BouncingScrollPhysics(),
                                     itemBuilder: (context, index) {
                                       return ContainerWithCircleAvatar(
-                                        name: state.users[index].name,
-                                        email: state.users[index].email,
-                                        username: state.users[index].username,
-                                        id: state.users[index].id,
+                                        name:
+                                            '${state.users[index].firstName} ${state.users[index].lastName}',
+                                        country: state.users[index].country,
+                                        username: state.users[index].userName,
+                                        phoneNumber:
+                                            state.users[index].phoneNumber,
                                         fontsize: size.width * 0.026,
                                         OnDeleteClick: (username) {
                                           context

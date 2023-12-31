@@ -96,7 +96,7 @@ class _deleteUserScreenState extends State<deleteUserScreen> {
 
   _deleteUserButton(
     Size size,
-    BuildContext context,
+    BuildContext blocContext,
     Map<String, dynamic> usedata,
   ) {
     return Container(
@@ -107,7 +107,106 @@ class _deleteUserScreenState extends State<deleteUserScreen> {
           _title(size, 'Click To delete User '),
           InkWell(
             onTap: () async {
-              context.read<deletebloc>().add(deleteUser(usedata));
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return Dialog(
+                      backgroundColor: Colors.transparent,
+                      child: Container(
+                        height: 350,
+                        width: 350,
+                        decoration: BoxDecoration(
+                            color: darkred,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(14))),
+                        child: Column(
+                          children: [
+                            Container(
+                              height: 75,
+                              width: 350,
+                              alignment: Alignment.center,
+                              child: text400normal(
+                                data: 'Delete Notice ',
+                                fontsize: 20,
+                                textColor: white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Divider(
+                              height: 2,
+                              color: grey,
+                            ),
+                            Container(
+                              height: 190,
+                              width: 350,
+                              alignment: Alignment.center,
+                              child: text400normal(
+                                data:
+                                    'Are You Sure That you want to delete ${usedata['fields']['CustomerName']['stringValue']} ?',
+                                fontsize: 20,
+                                align: TextAlign.center,
+                                textColor: white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Container(
+                              height: 2,
+                              width: 350,
+                              color: white,
+                            ),
+                            SizedBox(
+                              height: 75,
+                              width: 350,
+                              child: Row(
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      blocContext
+                                          .read<deletebloc>()
+                                          .add(deleteUser(usedata));
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Container(
+                                      width: 174,
+                                      height: 75,
+                                      alignment: Alignment.center,
+                                      child: text400normal(
+                                        data: 'Yes',
+                                        fontsize: 16,
+                                        textColor: white,
+                                        align: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 75,
+                                    width: 2,
+                                    color: white,
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Container(
+                                      width: 174,
+                                      height: 75,
+                                      alignment: Alignment.center,
+                                      child: text400normal(
+                                        data: 'No',
+                                        fontsize: 16,
+                                        textColor: white,
+                                        align: TextAlign.center,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  });
             },
             child: Container(
               alignment: Alignment.center,

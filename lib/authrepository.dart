@@ -1,89 +1,43 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:mondecare/config/Models/MyUser.dart';
+import 'package:uuid/v1.dart';
+import 'package:mondecare/core/utils/Backend/Backend.dart';
 
 class AuthRepository {
-  static const String firebaseApiKey =
-      'AIzaSyCOv1iqZLuMtoOlPnehDbonzipB0izq9Ro';
-  static const String firebaseAuthURL =
-      'https://identitytoolkit.googleapis.com/v1/accounts';
-  static const String firestoreURL =
-      'https://firestore.googleapis.com/v1/projects/mondecare-3b42f/databases/(default)/documents';
-  static const String domainName = 'https://firestore.googleapis.com/v1/';
+  //FUNCTION FINISHED
   Future<void> login(
-    String email,
+    String userName,
     String password,
     Function(MyUser success) onSuccess,
     Function(dynamic error) onFailed,
   ) async {
-    bool isUsername = email.length < 8;
-    String emailofUserName = '';
+    bool isUsername = userName.length < 8;
     try {
       if (isUsername) {
-        MyUser? user = await getUserByUserName(email);
+        MyUser? user = await getUserByUserName(userName);
         if (user != null) {
-          emailofUserName = user.email;
+          if (md5.convert(utf8.encode(password)).toString() == user.password) {
+            await onSuccess(user);
+          } else {
+            await onFailed('Password Is Not Correct');
+          }
         } else {
           await onFailed('User Not Found');
         }
       }
-      final response = await http.post(
-        Uri.parse('$firebaseAuthURL:signInWithPassword?key=$firebaseApiKey'),
-        body: json.encode({
-          'email': isUsername ? emailofUserName : email,
-          'password': password,
-          'returnSecureToken': true,
-        }),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200) {
-        MyUser? user =
-            await getUserByEmail(isUsername ? emailofUserName : email);
-        if (user != null) {
-          await onSuccess(user);
-        } else {
-          await onFailed('User Data Not Found');
-        }
-      } else {
-        await onFailed(json.decode(response.body)['error']['message']);
-      }
     } on SocketException {
       await onFailed('Check Your internet Connection');
     } catch (e) {
-      print(e.toString());
-      await onFailed('Error: $e');
+      await onFailed('Server Error');
     }
   }
 
-  Future<MyUser?> getUserByEmail(String email) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$firestoreURL/users'),
-      );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        print(response.body);
-        final List<dynamic> users = data['documents'];
-        for (var user in users) {
-          final userEmail = user['fields']['email']['stringValue'];
-          if (userEmail == email) {
-            return MyUser(
-                name: user['fields']['name']['stringValue'],
-                id: user['name'],
-                email: userEmail,
-                username: user['fields']['username']['stringValue']);
-          }
-        }
-      }
-    } catch (e) {}
-    return null;
-  }
-
+//FINISHED FUNCTION
   Future<Map<String, dynamic>?> getUserByUserNameMapReturn(
-      String SearchedUsername) async {
+      String searchedUserName) async {
     try {
       final response = await http.get(
         Uri.parse('$firestoreURL/users'),
@@ -94,13 +48,19 @@ class AuthRepository {
         final List<dynamic> users = data['documents'];
         for (var user in users) {
           final username = user['fields']['username']['stringValue'];
-          if (username == SearchedUsername) {
+          if (username == searchedUserName) {
             return {
               'user': MyUser(
-                  name: user['fields']['name']['stringValue'],
+                  firstName: user['fields']['firstName']['stringValue'],
+                  lastName: user['fields']['lastName']['stringValue'],
                   id: user['fields']['id']['stringValue'],
-                  email: user['fields']['email']['stringValue'],
-                  username: username),
+                  country: user['fields']['country']['stringValue'],
+                  phoneNumber: user['fields']['phoneNumber']['stringValue'],
+                  userName: username,
+                  question: user['fields']['question']['stringValue'],
+                  questionAnswer: user['fields']['questionAnswer']
+                      ['stringValue'],
+                  password: user['fields']['password']['stringValue']),
               'ref': user['name']
             };
           }
@@ -110,7 +70,8 @@ class AuthRepository {
     return null;
   }
 
-  Future<MyUser?> getUserByUserName(String SearchedUsername) async {
+//FINISHED FUNCTION REVIEW
+  Future<MyUser?> getUserByUserName(String searchedUsername) async {
     try {
       final response = await http.get(
         Uri.parse('$firestoreURL/users'),
@@ -120,13 +81,18 @@ class AuthRepository {
         final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> users = data['documents'];
         for (var user in users) {
-          final username = user['fields']['username']['stringValue'];
-          if (username == SearchedUsername) {
+          final username = user['fields']['userName']['stringValue'];
+          if (username == searchedUsername) {
             return MyUser(
-                name: user['fields']['name']['stringValue'],
-                id: user['name'],
-                email: user['fields']['email']['stringValue'],
-                username: username);
+                firstName: user['fields']['firstName']['stringValue'],
+                lastName: user['fields']['lastName']['stringValue'],
+                country: user['fields']['country']['stringValue'],
+                phoneNumber: user['fields']['phoneNumber']['stringValue'],
+                id: user['fields']['id']['stringValue'],
+                userName: username,
+                question: user['fields']['question']['stringValue'],
+                questionAnswer: user['fields']['questionAnswer']['stringValue'],
+                password: user['fields']['password']['stringValue']);
           }
         }
       }
@@ -134,57 +100,47 @@ class AuthRepository {
     return null;
   }
 
+//HERE WE CAN SAY THAT IS FINISH (MISSING PASSWORD FIXING)
   Future<void> signUpUser({
-    required String name,
-    required String email,
+    required String firstName,
+    required String lastName,
     required String password,
     required String username,
+    required String phoneNumber,
+    required String country,
+    required String question,
+    required String questionAnswer,
     required Function(dynamic success) onSuccess,
     required Function(dynamic error) onFailed,
   }) async {
     try {
-      MyUser? existingUser = await getUserByEmail(email);
-      if (existingUser != null) {
-        onFailed('Email already exists');
-        return;
-      }
-      existingUser = await getUserByUserName(username);
+      MyUser? existingUser = await getUserByUserName(username);
       if (existingUser != null) {
         onFailed('Username already exists');
         return;
       }
 
-      final response = await http.post(
-        Uri.parse('$firebaseAuthURL:signUp?key=$firebaseApiKey'),
+      await http.post(
+        Uri.parse('$firestoreURL/users'),
         body: json.encode({
-          'email': email,
-          'password': password,
-          'returnSecureToken': true,
+          'fields': {
+            'id': {'stringValue': const UuidV1().generate()},
+            'firstName': {'stringValue': firstName},
+            'lastName': {'stringValue': lastName},
+            'userName': {'stringValue': username},
+            'question': {'stringValue': question},
+            'phoneNumber': {'stringValue': phoneNumber},
+            'country': {'stringValue': country},
+            'questionAnswer': {'stringValue': questionAnswer},
+            'password': {
+              'stringValue': md5.convert(utf8.encode(password)).toString()
+            }
+          },
         }),
         headers: {'Content-Type': 'application/json'},
       );
 
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        final userId = responseData['localId'];
-
-        await http.post(
-          Uri.parse('$firestoreURL/users'),
-          body: json.encode({
-            'fields': {
-              'id': {'stringValue': userId},
-              'name': {'stringValue': name},
-              'email': {'stringValue': email},
-              'username': {'stringValue': username}
-            },
-          }),
-          headers: {'Content-Type': 'application/json'},
-        );
-
-        onSuccess({'success': true, 'message': 'User Registered Successfully'});
-      } else {
-        onFailed(json.decode(response.body)['error']['message']);
-      }
+      onSuccess({'success': true, 'message': 'User Registered Successfully'});
     } on SocketException {
       onFailed('Check Your Ineternet Connection');
     } catch (e) {
@@ -197,10 +153,10 @@ class AuthRepository {
       final response = await http.get(
         Uri.parse('$firestoreURL/users'),
       );
-
+      final List<MyUser> users = [];
+      print(response.body);
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        final List<MyUser> users = [];
 
         if (data.containsKey('documents')) {
           final List<dynamic> documents = data['documents'];
@@ -209,32 +165,29 @@ class AuthRepository {
             final fields = doc['fields'] as Map<String, dynamic>?;
 
             if (fields != null) {
-              final name = fields['name']?['stringValue'] ?? '';
-              final username = fields['username']?['stringValue'] ?? '';
-              final id = fields['id']?['stringValue'] ?? '';
-              final email = fields['email']?['stringValue'] ?? '';
-
               final user = MyUser.fromJson({
-                'name': name,
-                'id': id,
-                'email': email,
-                'username': username
+                'firstName': fields['firstName']['stringValue'],
+                'lastName': fields['lastName']['stringValue'],
+                'id': fields['id']['stringValue'],
+                'phoneNumber': fields['phoneNumber']['stringValue'],
+                'userName': fields['userName']['stringValue'],
+                'country': fields['country']['stringValue'],
+                'question': fields['question']['stringValue'],
+                'questionAnswer': fields['questionAnswer']['stringValue'],
+                'password': fields['password']['stringValue']
               });
               users.add(user);
             }
           }
         }
-
-        return users;
-      } else {
-        return [];
       }
+      return users;
     } catch (e) {
       return [];
     }
   }
 
-  Future<bool> deleteUser(String username) async {
+  Future<Map<String, dynamic>> deleteUser(String username) async {
     try {
       // Fetch user details and document reference from Firestore
       Map<String, dynamic>? userResponse =
@@ -245,18 +198,28 @@ class AuthRepository {
           Uri.parse('$domainName$documentReference'),
           headers: {'Content-Type': 'application/json'},
         );
-        print(Uri.parse('$domainName$documentReference'));
-        print(firestoreDeleteResponse.body);
 
         if (firestoreDeleteResponse.statusCode == 200) {
-          return true;
+          return {
+            'status': 'success',
+            'message': 'Delete succesful',
+          };
         }
       }
+      return {
+        'status': 'success',
+        'message': 'User Reference Not Reached',
+      };
     } on SocketException {
-      print('Internet Connection Error');
+      return {
+        'status': 'error',
+        'message': 'Check Your Internet Connection',
+      };
     } catch (e) {
-      print('Error deleting user: $e');
+      return {
+        'status': 'success',
+        'message': 'Unknown Server error',
+      };
     }
-    return false;
   }
 }

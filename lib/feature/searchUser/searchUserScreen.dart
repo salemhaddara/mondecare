@@ -338,17 +338,22 @@ class _searchUserScreenState extends State<searchUserScreen> {
     var numberfont = await rootBundle.load("assets/fonts/bolded.ttf");
     final ttf = pw.Font.ttf(data);
     final ttfBolded = pw.Font.ttf(numberfont);
-    final Card = customer.CardType == Backend.CardTypeVIP
-        ? pw.MemoryImage(
-            (await rootBundle.load('assets/images/vip.png'))
-                .buffer
-                .asUint8List(),
-          )
-        : pw.MemoryImage(
-            (await rootBundle.load('assets/images/pearl.png'))
-                .buffer
-                .asUint8List(),
-          );
+    var Card;
+    if (customer.CardType == Backend.cardTypeVip) {
+      Card = pw.MemoryImage(
+        (await rootBundle.load('assets/images/vip.png')).buffer.asUint8List(),
+      );
+    } else if (customer.CardType == Backend.cardTypePearl) {
+      Card = pw.MemoryImage(
+        (await rootBundle.load('assets/images/pearl.png')).buffer.asUint8List(),
+      );
+    } else {
+      Card = pw.MemoryImage(
+        (await rootBundle.load('assets/images/pyramids.png'))
+            .buffer
+            .asUint8List(),
+      );
+    }
     pdf.addPage(pw.Page(
       pageFormat: PdfPageFormat.a4,
       margin: const pw.EdgeInsets.symmetric(horizontal: 0, vertical: 0),
@@ -433,7 +438,8 @@ class _searchUserScreenState extends State<searchUserScreen> {
             pw.Align(
                 alignment: pw.Alignment.bottomLeft,
                 child: pw.Container(
-                    margin: const pw.EdgeInsets.all(24),
+                    margin: const pw.EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 24),
                     child: pw.Text(
                       customer.CardNumber,
                       textAlign: pw.TextAlign.center,

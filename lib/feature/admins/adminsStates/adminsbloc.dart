@@ -22,15 +22,15 @@ class adminsbloc extends Bloc<adminsevent, adminsstate> {
     on<deleteAdmin>(
       (event, emit) async {
         emit(state.copyWith(tracker: deleteLoading()));
-        bool deleteState = await repo.deleteUser(event.username);
+        var response = (await repo.deleteUser(event.username));
+        bool deleteState = response['status'] == 'success';
         if (deleteState) {
           if ((await Preferences.getUserName()) == event.username) {
             await Preferences.deleteSavedData();
           }
           emit(state.copyWith(tracker: deleteSuccess(), users: []));
         } else {
-          emit(state.copyWith(
-              tracker: deleteFailed('User Not Deleted Try Again')));
+          emit(state.copyWith(tracker: deleteFailed(response['message'])));
         }
       },
     );

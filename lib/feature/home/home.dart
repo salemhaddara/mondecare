@@ -1,4 +1,4 @@
-// ignore_for_file: camel_case_types, non_constant_identifier_names
+// ignore_for_file: camel_case_types, non_constant_identifier_names, unused_element
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,7 +29,7 @@ class _homeState extends State<home> {
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
-    _tooltip = TooltipBehavior(enable: true);
+    _tooltip = TooltipBehavior(enable: true, color: white, borderColor: white);
 
     return Scaffold(
         appBar: AppBar(
@@ -56,6 +56,7 @@ class _homeState extends State<home> {
               physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
+                  _decorationTop(size),
                   _insights(size),
                   _homeTitle(size),
                   _homelist(),
@@ -64,6 +65,28 @@ class _homeState extends State<home> {
             ),
           ),
         ));
+  }
+
+  _decorationTop(Size size) {
+    return Container(
+      height: size.height / 5,
+      width: size.width,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+            darkgrey,
+            grey,
+            darkred,
+          ])),
+      child: Stack(children: [
+        Align(
+            alignment: Alignment.center,
+            child: SvgPicture.asset('assets/images/iconwhite.svg'))
+      ]),
+    );
   }
 
   _insights(Size size) {
@@ -83,68 +106,99 @@ class _homeState extends State<home> {
         List<_ChartData> data = userCountPerCardType.entries.map((entry) {
           return _ChartData(entry.key, entry.value.toDouble());
         }).toList();
-        return Wrap(
-          children: [
-            _InsightsTitle(size),
-            Container(
-                margin: const EdgeInsets.all(10),
-                width: size.width > 600 ? (size.width / 2) - 32 : size.width,
-                child: Material(
-                  borderRadius: const BorderRadius.all(Radius.circular(14)),
-                  elevation: 4,
-                  child: SfCircularChart(
-                    title: ChartTitle(
-                      text: 'Customers by Country',
-                      textStyle: GoogleFonts.montserrat(
-                          fontSize: size.width * 0.02,
-                          fontWeight: FontWeight.w400,
-                          color: darkgrey),
-                    ),
-                    legend: const Legend(isVisible: true),
-                    series: <PieSeries<_PieData, String>>[
-                      PieSeries<_PieData, String>(
-                        explode: true,
-                        explodeIndex: 0,
-                        dataSource: pieData,
-                        xValueMapper: (_PieData data, _) => data.xData,
-                        yValueMapper: (_PieData data, _) => data.yData,
-                        dataLabelMapper: (_PieData data, _) => data.text,
-                        dataLabelSettings:
-                            const DataLabelSettings(isVisible: true),
-                      )
-                    ],
-                  ),
-                )),
-            Container(
-                margin: const EdgeInsets.all(10),
-                width: size.width > 600 ? (size.width / 2) - 32 : size.width,
-                child: Material(
-                  borderRadius: const BorderRadius.all(Radius.circular(14)),
-                  elevation: 4,
-                  child: SfCartesianChart(
+        return ClipRRect(
+          borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(14), topRight: Radius.circular(14)),
+          child: Wrap(
+            children: [
+              _InsightsTitle(size),
+              Container(
+                  margin: const EdgeInsets.all(10),
+                  width: size.width > 600 ? (size.width / 2) - 32 : size.width,
+                  decoration: BoxDecoration(
+                      color: darkgrey,
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(14))),
+                  child: Material(
+                    borderRadius: const BorderRadius.all(Radius.circular(14)),
+                    elevation: 4,
+                    color: Colors.transparent,
+                    child: SfCircularChart(
                       title: ChartTitle(
-                        text: 'Customers By Card Type',
+                        text: 'Customers by Country',
                         textStyle: GoogleFonts.montserrat(
                             fontSize: size.width * 0.02,
-                            fontWeight: FontWeight.w400,
-                            color: darkgrey),
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white),
                       ),
-                      primaryXAxis: CategoryAxis(),
-                      primaryYAxis: NumericAxis(
-                          minimum: 0,
-                          maximum: state.customers.length.floorToDouble(),
-                          interval: _getInterval(state.customers.length)),
-                      tooltipBehavior: _tooltip,
-                      series: <ChartSeries<_ChartData, String>>[
-                        AreaSeries<_ChartData, String>(
-                            dataSource: data,
-                            xValueMapper: (_ChartData data, _) => data.x,
-                            yValueMapper: (_ChartData data, _) => data.y,
-                            name: 'Gold',
-                            color: const Color.fromRGBO(8, 142, 255, 1))
-                      ]),
-                )),
-          ],
+                      legend: Legend(
+                          isVisible: true, textStyle: TextStyle(color: white)),
+                      series: <PieSeries<_PieData, String>>[
+                        PieSeries<_PieData, String>(
+                          legendIconType: LegendIconType.circle,
+                          pointColorMapper: (datum, index) {
+                            var colorsList = [
+                              white,
+                              grey,
+                            ];
+                            if (index < 2) {
+                              return colorsList[index];
+                            }
+                            return null;
+                          },
+                          explode: true,
+                          explodeIndex: 0,
+                          dataSource: pieData,
+                          strokeColor: white,
+                          xValueMapper: (_PieData data, _) => data.xData,
+                          yValueMapper: (_PieData data, _) => data.yData,
+                          dataLabelMapper: (_PieData data, _) => data.text,
+                          dataLabelSettings:
+                              const DataLabelSettings(isVisible: true),
+                        )
+                      ],
+                    ),
+                  )),
+              Container(
+                  margin: const EdgeInsets.all(10),
+                  width: size.width > 600 ? (size.width / 2) - 32 : size.width,
+                  child: Material(
+                    borderRadius: const BorderRadius.all(Radius.circular(14)),
+                    elevation: 4,
+                    color: darkred,
+                    child: SfCartesianChart(
+                        title: ChartTitle(
+                          text: 'Customers By Card Type',
+                          textStyle: GoogleFonts.montserrat(
+                              fontSize: size.width * 0.02,
+                              fontWeight: FontWeight.w400,
+                              color: white),
+                        ),
+                        crosshairBehavior: CrosshairBehavior(lineColor: white),
+                        primaryXAxis: CategoryAxis(
+                            labelStyle: TextStyle(color: white),
+                            isVisible: true,
+                            borderColor: white,
+                            axisLine: AxisLine(color: white)),
+                        primaryYAxis: NumericAxis(
+                            labelStyle: TextStyle(color: white),
+                            borderColor: white,
+                            minimum: 0,
+                            axisLine: AxisLine(color: white),
+                            maximum: state.customers.length.floorToDouble(),
+                            interval: _getInterval(state.customers.length)),
+                        tooltipBehavior: _tooltip,
+                        series: <ChartSeries<_ChartData, String>>[
+                          AreaSeries<_ChartData, String>(
+                              dataSource: data,
+                              xValueMapper: (_ChartData data, _) => data.x,
+                              yValueMapper: (_ChartData data, _) => data.y,
+                              name: '',
+                              color: white)
+                        ]),
+                  )),
+            ],
+          ),
         );
       }
       return Container();
@@ -186,11 +240,11 @@ class _homeState extends State<home> {
           mainAxisSpacing: 12.0,
         ),
         children: [
-          _homelistItem(size, 'searchuser', 'Search User', searchUserRoute),
-          _homelistItem(size, 'adduser', 'Add User', addUserRoute),
+          _homelistItem(size, 'searchuser', 'Search Member', searchUserRoute),
+          _homelistItem(size, 'adduser', 'Add Member', addUserRoute),
           _homelistItem(size, 'admin', 'Admins', allUsersScreenRoute),
           _homelistItem(
-              size, 'deleteuser', 'Delete User', deleteUserScreenRoute),
+              size, 'deleteuser', 'Delete Member', deleteUserScreenRoute),
           _homelistItem(size, 'logs', 'Logs', logsScreenRoute),
         ],
       ),
@@ -245,9 +299,10 @@ class _homeState extends State<home> {
             child: Column(
               children: [
                 Expanded(
-                    flex: 2,
-                    child: SvgPicture.asset('assets/images/$imagePath.svg')),
-                Expanded(child: Container()),
+                    flex: 3,
+                    child: SvgPicture.asset(
+                      'assets/images/$imagePath.svg',
+                    )),
                 Expanded(
                     flex: 1,
                     child: text400normal(

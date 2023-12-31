@@ -7,12 +7,14 @@ import 'package:mondecare/core/utils/Backend/Backend.dart';
 class ChoosePhotoWidget extends StatefulWidget {
   final String imagePath1;
   final String imagePath2;
+  final String imagePath3;
   final Function(dynamic) onImageSelected;
 
   const ChoosePhotoWidget({
     Key? key,
     required this.imagePath1,
     required this.imagePath2,
+    required this.imagePath3,
     required this.onImageSelected,
   }) : super(key: key);
 
@@ -29,8 +31,8 @@ class _ChoosePhotoWidgetState extends State<ChoosePhotoWidget> {
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Container(
-      height: 54,
-      constraints: const BoxConstraints(maxWidth: 500),
+      height: 108,
+      constraints: const BoxConstraints(maxWidth: 1000),
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -40,7 +42,7 @@ class _ChoosePhotoWidgetState extends State<ChoosePhotoWidget> {
               widget.imagePath1,
               maxWidth,
               screenWidth,
-              Backend.CardTypePearl,
+              Backend.cardTypePearl,
             ),
           ),
           Expanded(
@@ -48,7 +50,15 @@ class _ChoosePhotoWidgetState extends State<ChoosePhotoWidget> {
               widget.imagePath2,
               maxWidth,
               screenWidth,
-              Backend.CardTypeVIP,
+              Backend.cardTypeVip,
+            ),
+          ),
+          Expanded(
+            child: _buildImage(
+              widget.imagePath3,
+              maxWidth,
+              screenWidth,
+              Backend.cardTypePyramids,
             ),
           ),
         ],
@@ -61,6 +71,7 @@ class _ChoosePhotoWidgetState extends State<ChoosePhotoWidget> {
     bool isSelected = selectedValue == value;
 
     return Container(
+      padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         border: Border.all(
           color: isSelected ? gold : Colors.transparent,

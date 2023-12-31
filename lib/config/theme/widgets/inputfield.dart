@@ -14,6 +14,7 @@ class InputField extends StatefulWidget {
   double? height;
   bool? withStroke;
   bool isNumber;
+  IconData icon;
   InputField(
       {Key? key,
       required this.isPassword,
@@ -21,6 +22,7 @@ class InputField extends StatefulWidget {
       required this.initialState,
       required this.validator,
       required this.onChanged,
+      required this.icon,
       this.height,
       this.withStroke,
       this.isNumber = false,
@@ -64,6 +66,10 @@ class _InputFieldState extends State<InputField> {
               hintText: widget.hint,
               filled: true,
               fillColor: white,
+              prefixIcon: Icon(
+                widget.icon,
+                color: darkred,
+              ),
               errorBorder: OutlineInputBorder(
                   borderRadius: const BorderRadius.all(Radius.circular(13)),
                   borderSide: BorderSide(color: darkred)),

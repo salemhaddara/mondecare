@@ -1,7 +1,7 @@
-// ignore_for_file: camel_case_types, non_constant_identifier_names
+// ignore_for_file: camel_case_types, non_constant_identifier_names, library_prefixes
 
 import 'dart:ui';
-
+import 'package:country_picker/country_picker.dart' as countryPicker;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,8 +11,10 @@ import 'package:mondecare/config/theme/colors.dart';
 import 'package:mondecare/config/theme/widgets/Snackbar.dart';
 import 'package:mondecare/config/theme/widgets/button.dart';
 import 'package:mondecare/config/theme/widgets/inputfield.dart';
+import 'package:mondecare/config/theme/widgets/phoneinput.dart';
 import 'package:mondecare/config/theme/widgets/text400normal.dart';
 import 'package:mondecare/core/routes/routes.dart';
+import 'package:mondecare/feature/signup/signupcomponents/dropDown.dart';
 import 'package:mondecare/feature/signup/signupstates/signupevent.dart';
 import 'package:mondecare/feature/signup/signupstates/signupstate.dart';
 import 'package:mondecare/feature/signup/signupsubmission/signupsubmissionevent.dart';
@@ -29,10 +31,14 @@ class signup extends StatefulWidget {
 class _signupState extends State<signup> {
   final formKey = GlobalKey<FormState>();
   String phoneNumbercheck = '',
+      phoneNumber = '',
       usernamecheck = '',
-      namecheck = '',
-      emailcheck = '',
-      passwordcheck = '';
+      firstNamecheck = '',
+      lastName = '',
+      passwordcheck = '',
+      countrycheck = 'Egypt',
+      questioncheck = '',
+      answercheck = '';
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -47,9 +53,7 @@ class _signupState extends State<signup> {
       body: BlocProvider(
         create: (context) => signupbloc(context.read<AuthRepository>()),
         child: Directionality(
-          textDirection:
-              // defaultLang == 'ar' ? TextDirection.rtl :
-              TextDirection.ltr,
+          textDirection: TextDirection.ltr,
           child: Stack(
             children: [
               Align(
@@ -97,14 +101,18 @@ class _signupState extends State<signup> {
                                 )),
                                 child: SingleChildScrollView(
                                   physics: const BouncingScrollPhysics(),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(16),
-                                    child: Column(children: [
-                                      _signupTitle(size),
-                                      _SignUpForm(size),
-                                      _Spacer(20),
-                                      _SignInRichText(size)
-                                    ]),
+                                  child: SizedBox(
+                                    width: MediaQuery.of(context).size.width,
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      padding: const EdgeInsets.all(16),
+                                      child: Column(children: [
+                                        _signupTitle(size),
+                                        _SignUpForm(size),
+                                        _Spacer(20),
+                                        _SignInRichText(size)
+                                      ]),
+                                    ),
                                   ),
                                 ),
                               ))))),
@@ -125,27 +133,7 @@ class _signupState extends State<signup> {
     );
   }
 
-  Widget _SignUpForm(Size size) {
-    return Form(
-        key: formKey,
-        child: Column(
-          children: [
-            _codeTitle(size),
-            _codeInputField(size),
-            _nameTitle(size),
-            _nameInputField(size),
-            _usernameTitle(size),
-            _usernameField(size),
-            _emailTitle(size),
-            _emailInputField(size),
-            _passwordTitle(size),
-            _passwordInputField(size),
-            _signUpButton(size, context)
-          ],
-        ));
-  }
-
-  Widget _signupTitle(Size size) {
+  _signupTitle(Size size) {
     return Container(
         height: 50,
         width: size.width,
@@ -162,23 +150,11 @@ class _signupState extends State<signup> {
         ));
   }
 
-  Widget _codeTitle(Size size) {
-    return Container(
-      width: size.width,
-      constraints: const BoxConstraints(maxWidth: 600),
-      margin: const EdgeInsets.only(top: 10, bottom: 10),
-      child: text400normal(
-        data: 'Secret Code ',
-        textColor: darkgrey,
-        fontsize: size.height * 0.017,
-      ),
-    );
-  }
-
-  Widget _codeInputField(Size size) {
+  _codeInputField(Size size) {
     return InputField(
       hint: '',
       isPassword: false,
+      icon: Icons.password,
       validator: (name) {
         if (name != 'mondecarecairo\$#@') {
           return 'Enter The Secret Code ';
@@ -187,41 +163,16 @@ class _signupState extends State<signup> {
       },
       initialState: false,
       onChanged: (text) {
-        namecheck = '$text';
+        firstNamecheck = '$text';
       },
     );
   }
 
-  Widget _nameTitle(Size size) {
-    return Container(
-      width: size.width,
-      constraints: const BoxConstraints(maxWidth: 600),
-      margin: const EdgeInsets.only(top: 10, bottom: 10),
-      child: text400normal(
-        data: 'Name',
-        textColor: darkgrey,
-        fontsize: size.height * 0.017,
-      ),
-    );
-  }
-
-  Widget _usernameTitle(Size size) {
-    return Container(
-      width: size.width,
-      constraints: const BoxConstraints(maxWidth: 600),
-      margin: const EdgeInsets.only(top: 10, bottom: 10),
-      child: text400normal(
-        data: 'UserName',
-        textColor: darkgrey,
-        fontsize: size.height * 0.013,
-      ),
-    );
-  }
-
-  Widget _nameInputField(Size size) {
+  _nameInputField(Size size) {
     return InputField(
       hint: '',
       isPassword: false,
+      icon: Icons.person_2,
       validator: (name) {
         if (name!.isEmpty) {
           return null;
@@ -233,28 +184,16 @@ class _signupState extends State<signup> {
       },
       initialState: false,
       onChanged: (text) {
-        namecheck = '$text';
+        firstNamecheck = '$text';
       },
     );
   }
 
-  Widget _emailTitle(Size size) {
-    return Container(
-      width: size.width,
-      constraints: const BoxConstraints(maxWidth: 600),
-      margin: const EdgeInsets.only(top: 10, bottom: 10),
-      child: text400normal(
-        data: 'Email Address',
-        textColor: darkgrey,
-        fontsize: size.height * 0.013,
-      ),
-    );
-  }
-
-  Widget _usernameField(Size size) {
+  _usernameField(Size size) {
     return InputField(
       hint: '',
       isPassword: false,
+      icon: Icons.person_4_outlined,
       validator: (username) {
         if (username!.isEmpty) {
           return null;
@@ -277,27 +216,44 @@ class _signupState extends State<signup> {
     );
   }
 
-  Widget _emailInputField(Size size) {
+  _answerField(Size size) {
     return InputField(
       hint: '',
       isPassword: false,
-      validator: (email) {
-        if (email!.isEmpty) {
+      icon: Icons.question_answer,
+      validator: (answer) {
+        if (answer!.isEmpty) {
           return null;
         }
-        if (!isValidEmail(email)) {
-          return 'Enter A Valid Email';
+
+        return null;
+      },
+      initialState: false,
+      onChanged: (text) {
+        answercheck = '$text';
+      },
+    );
+  }
+
+  _lastNameInputField(Size size) {
+    return InputField(
+      hint: '',
+      isPassword: false,
+      icon: Icons.person_3_rounded,
+      validator: (lastName) {
+        if (lastName != null && lastName.isNotEmpty && lastName.length > 12) {
+          return 'Enter You Last Name < 12 characters';
         }
         return null;
       },
       initialState: false,
       onChanged: (text) {
-        emailcheck = '$text';
+        lastName = '$text';
       },
     );
   }
 
-  Widget _SignInRichText(Size size) {
+  _SignInRichText(Size size) {
     return signinrichtext(
       startText: 'Have An Account ? ',
       clickableText: 'Sign In',
@@ -308,13 +264,13 @@ class _signupState extends State<signup> {
     );
   }
 
-  Widget _signUpButton(Size size, BuildContext pagecontext) {
+  _signUpButton(Size size, BuildContext pagecontext) {
     bool Navigated = false;
     bool isError = false;
     return BlocBuilder<signupbloc, signupstate>(builder: (context, state) {
       if (state.formstatus is signupsubmissionsuccess && !Navigated) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          Navigator.of(pagecontext).pop();
+          Navigator.of(context).pop();
         });
         Navigated = true;
         return Container();
@@ -344,14 +300,23 @@ class _signupState extends State<signup> {
                 text: 'Sign Up',
                 onTap: () {
                   if (formKey.currentState!.validate()) {
-                    if (namecheck.isNotEmpty &&
-                        emailcheck.isNotEmpty &&
-                        passwordcheck.isNotEmpty) {
+                    if (firstNamecheck.isNotEmpty &&
+                        lastName.isNotEmpty &&
+                        usernamecheck.isNotEmpty &&
+                        passwordcheck.isNotEmpty &&
+                        countrycheck.isNotEmpty &&
+                        questioncheck.isNotEmpty &&
+                        phoneNumber.isNotEmpty &&
+                        answercheck.isNotEmpty) {
                       context.read<signupbloc>().add((signupSubmitted(
-                          email: emailcheck,
+                          firstname: firstNamecheck,
+                          lastName: lastName,
+                          username: usernamecheck,
                           password: passwordcheck,
-                          name: namecheck,
-                          username: usernamecheck)));
+                          phoneNumber: phoneNumbercheck,
+                          country: countrycheck,
+                          question: questioncheck,
+                          questionAnswer: answercheck)));
                     } else {
                       ScaffoldMessenger.of(pagecontext).showSnackBar(
                           showSnackbar('Fill All Required Data', size));
@@ -367,10 +332,46 @@ class _signupState extends State<signup> {
     });
   }
 
-  Widget _passwordInputField(Size size) {
+  _RetypepasswordInputField(Size size) {
     return InputField(
       hint: '',
       isPassword: true,
+      icon: Icons.verified_outlined,
+      validator: (password) {
+        if (password == null || password.isEmpty) {
+          return null;
+        }
+        if (password != (passwordcheck)) {
+          return 'The Passwords are not the same';
+        }
+        return null;
+      },
+      initialState: true,
+      onChanged: (text) {},
+    );
+  }
+
+  _phoneNumber(Size size) {
+    return Container(
+      width: size.width,
+      constraints: const BoxConstraints(maxWidth: 600),
+      child: Column(
+        children: [
+          phoneinput(onChanged: (text) {
+            phoneNumbercheck = text.completeNumber;
+            phoneNumber = text.number;
+          }),
+        ],
+      ),
+    );
+  }
+
+  //Saved Password to PasswordCheck
+  _passwordInputField(Size size) {
+    return InputField(
+      hint: '',
+      isPassword: true,
+      icon: Icons.password,
       validator: (password) {
         if (password == null || password.isEmpty) {
           return null;
@@ -387,29 +388,23 @@ class _signupState extends State<signup> {
     );
   }
 
-  Widget _passwordTitle(Size size) {
+  _Title(Size size, String title) {
     return Container(
       width: size.width,
       constraints: const BoxConstraints(maxWidth: 600),
       margin: const EdgeInsets.only(top: 10, bottom: 10),
       child: text400normal(
-        data: 'Password',
+        data: title,
         textColor: darkgrey,
         fontsize: size.height * 0.013,
       ),
     );
   }
 
-  Widget _Spacer(double height) {
+  _Spacer(double height) {
     return SizedBox(
       height: height,
     );
-  }
-
-  bool isValidEmail(String email) {
-    RegExp emailRegExp =
-        RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
-    return emailRegExp.hasMatch(email);
   }
 
   bool isUsernameValid(String username) {
@@ -417,5 +412,100 @@ class _signupState extends State<signup> {
       return true;
     }
     return false;
+  }
+
+  _SignUpForm(Size size) {
+    return Form(
+        key: formKey,
+        child: Column(
+          children: [
+            //-----------------------------------Secret Code
+            _Title(size, 'Secret Code'),
+            _codeInputField(size),
+            //-----------------------------------First Name
+            _Title(size, 'First Name'),
+            _nameInputField(size),
+            //-----------------------------------LastName
+            _Title(size, 'Last Name'),
+            _lastNameInputField(size),
+            //-----------------------------------User Name
+            _Title(size, 'Username'),
+            _usernameField(size),
+            //-----------------------------------Country Chooser
+            _Title(size, 'Choose Your Country'),
+            _countryChooser(size),
+            //-----------------------------------Safety Question
+            _Title(size, 'Choose Your Safety Question'),
+            _questionChooser(),
+            //-----------------------------------Safety Question Answer
+            _Title(size, 'Write an Answer for the question'),
+            _answerField(size),
+            //-----------------------------------Phone Number
+            _Title(size, 'PhoneNumber'),
+            _phoneNumber(size),
+            //-----------------------------------Password
+            _Title(size, 'Password'),
+            _passwordInputField(size),
+
+            //-----------------------------------Check Password
+            _Title(size, 'Re-Type Password'),
+            _RetypepasswordInputField(size),
+            //-----------------------------------Submit Button
+            _signUpButton(size, context)
+          ],
+        ));
+  }
+
+  _questionChooser() {
+    return questionsdropDownMenu(
+      onChanged: (value) {
+        questioncheck = value;
+      },
+    );
+  }
+
+  _countryChooser(Size size) {
+    return Container(
+      width: size.width,
+      height: 54,
+      constraints: const BoxConstraints(maxWidth: 600),
+      child: Column(
+        children: [
+          Material(
+            borderRadius: const BorderRadius.all(Radius.circular(14)),
+            child: InkWell(
+              borderRadius: const BorderRadius.all(Radius.circular(14)),
+              onTap: () {
+                countryPicker.showCountryPicker(
+                  context: context,
+                  showPhoneCode: false,
+                  onSelect: (countryPicker.Country selectedCountry) {
+                    setState(() {
+                      countrycheck = selectedCountry.name;
+                    });
+                  },
+                );
+              },
+              child: Container(
+                  width: size.width,
+                  height: 54,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                      color: white,
+                      border: Border.all(
+                        color: darkgrey,
+                        width: 2,
+                      ),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(14))),
+                  child: text400normal(
+                    data: countrycheck,
+                    fontsize: size.height * 0.017,
+                  )),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

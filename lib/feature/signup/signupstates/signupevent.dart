@@ -23,12 +23,24 @@ class signupEmailChanged extends signupevent {
 }
 
 class signupSubmitted extends signupevent {
-  String email, password, name, username;
-  signupSubmitted(
-      {required this.email,
-      required this.password,
-      required this.name,
-      required this.username});
+  String firstname,
+      lastName,
+      password,
+      username,
+      country,
+      phoneNumber,
+      question,
+      questionAnswer;
+  signupSubmitted({
+    required this.firstname,
+    required this.lastName,
+    required this.username,
+    required this.country,
+    required this.password,
+    required this.question,
+    required this.phoneNumber,
+    required this.questionAnswer,
+  });
 }
 
 class returninitial extends signupevent {}

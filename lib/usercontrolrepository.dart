@@ -10,13 +10,6 @@ import 'package:mondecare/core/utils/Preferences/Preferences.dart';
 import 'package:mondecare/feature/searchUser/searchbloc/Repository/searchRepository.dart';
 
 class usercontrolrepository {
-  static const String firebaseApiKey =
-      'AIzaSyCOv1iqZLuMtoOlPnehDbonzipB0izq9Ro';
-  static const String firebaseAuthURL =
-      'https://identitytoolkit.googleapis.com/v1/accounts';
-  static const String firestoreURL =
-      'https://firestore.googleapis.com/v1/projects/mondecare-3b42f/databases/(default)/documents';
-
   Future<bool> createCustomer({
     required Customer customer,
     required Function(dynamic success) onSuccess,
@@ -63,17 +56,17 @@ class usercontrolrepository {
     }
   }
 
-  Future<void> saveloginLog() async {
-    await http.post(
-      Uri.parse('$firestoreURL/logs'),
-      body: json.encode(
-        logEvent('N/A', await Preferences.getUserName() ?? 'N/A',
-                DateTime.now(), 'login')
-            .toMapWithType(),
-      ),
-      headers: {'Content-Type': 'application/json'},
-    );
-  }
+  // Future<void> saveloginLog() async {
+  //   await http.post(
+  //     Uri.parse('$firestoreURL/logs'),
+  //     body: json.encode(
+  //       logEvent('N/A', await Preferences.getUserName() ?? 'N/A',
+  //               DateTime.now(), 'login')
+  //           .toMapWithType(),
+  //     ),
+  //     headers: {'Content-Type': 'application/json'},
+  //   );
+  // }
 
   Future<List<Customer>> getAllCustomersFromFirestore() async {
     try {

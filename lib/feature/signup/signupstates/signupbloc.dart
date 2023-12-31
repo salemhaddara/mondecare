@@ -13,10 +13,14 @@ class signupbloc extends Bloc<signupevent, signupstate> {
       emit(state.copyWith(formstatus: signupformsubmitting()));
 
       await repo.signUpUser(
-          name: event.name,
-          email: event.email,
+          firstName: event.firstname,
+          lastName: event.lastName,
+          question: event.question,
           password: event.password,
           username: event.username,
+          phoneNumber: event.phoneNumber,
+          country: event.country,
+          questionAnswer: event.questionAnswer,
           onFailed: (message) {
             emit(state.copyWith(formstatus: signupsubmissionfailed(message)));
           },
