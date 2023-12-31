@@ -3,22 +3,18 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:mondecare/config/Models/logEvent.dart';
+import 'package:mondecare/core/utils/Backend/Backend.dart';
+import 'package:mondecare/core/utils/Preferences/Preferences.dart';
 
 class deleteRepository {
-  static const String firebaseApiKey =
-      'AIzaSyCOv1iqZLuMtoOlPnehDbonzipB0izq9Ro';
-  static const String firebaseAuthURL =
-      'https://identitytoolkit.googleapis.com/v1/accounts';
-  static const String firestoreURL =
-      'https://firestore.googleapis.com/v1/projects/mondecare-3b42f/databases/(default)/documents';
-
   Future<Map<String, dynamic>> deleteUser(
       Map<String, dynamic> userEntry) async {
     try {
       final documentId = userEntry['name'].split('/').last;
       final deleteResponse =
           await http.delete(Uri.parse('$firestoreURL/customers/$documentId'));
-
+      await saveloginLog(user: userEntry['fields']['userName'], type: 'Delete');
       if (deleteResponse.statusCode == 200) {
         return {'status': 'success', 'message': 'Deleted user successfully'};
       } else {
@@ -27,6 +23,21 @@ class deleteRepository {
     } catch (e) {
       return {'status': 'error', 'message': 'Failed to delete user'};
     }
+  }
+
+  Future<void> saveloginLog({String? user, String? type}) async {
+    await http.post(
+      Uri.parse('$firestoreURL/logs'),
+      body: json.encode(
+        logEvent(
+          user: user ?? 'N/A',
+          admin: (await Preferences.getUserName() ?? ''),
+          type: type ?? 'N/A',
+          time: DateTime.now(),
+        ).toMapWithType(),
+      ),
+      headers: {'Content-Type': 'application/json'},
+    );
   }
 
   Future<Map<String, dynamic>> searchUsertoDelete(

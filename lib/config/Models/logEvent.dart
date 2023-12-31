@@ -3,7 +3,12 @@
 class logEvent {
   String user, type, admin;
   DateTime time;
-  logEvent(this.user, this.admin, this.time, this.type);
+  logEvent({
+    required this.user,
+    required this.admin,
+    required this.time,
+    required this.type,
+  });
   Map<String, dynamic> toMap() {
     return {
       'user': user,
@@ -15,10 +20,10 @@ class logEvent {
 
   factory logEvent.fromMap(Map<String, dynamic> map) {
     return logEvent(
-      map['user'] as String,
-      map['admin'] as String,
-      DateTime.parse(map['time'] as String).toLocal(),
-      map['type'] as String,
+      user: map['user'] as String,
+      admin: map['admin'] as String,
+      time: DateTime.parse(map['time'] as String).toLocal(),
+      type: map['type'] as String,
     );
   }
   Map<String, dynamic> toMapWithType() {

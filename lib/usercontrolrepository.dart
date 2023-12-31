@@ -23,18 +23,10 @@ class usercontrolrepository {
           body: json.encode(customer.toMapWithType()),
           headers: {'Content-Type': 'application/json'},
         );
-        await http.post(
-          Uri.parse('$firestoreURL/logs'),
-          body: json.encode(
-            logEvent(
-                    customer.CardNumber,
-                    await Preferences.getUserName() ?? 'N/A',
-                    DateTime.now(),
-                    'add')
-                .toMapWithType(),
-          ),
-          headers: {'Content-Type': 'application/json'},
-        );
+        await saveloginLog(
+            user: customer.CustomerName,
+            admin: await Preferences.getUserName() ?? 'N/A',
+            type: 'add');
         if (response.statusCode == 200) {
           onSuccess(
               {'success': true, 'message': 'Customer Registered Successfully'});
@@ -56,17 +48,20 @@ class usercontrolrepository {
     }
   }
 
-  // Future<void> saveloginLog() async {
-  //   await http.post(
-  //     Uri.parse('$firestoreURL/logs'),
-  //     body: json.encode(
-  //       logEvent('N/A', await Preferences.getUserName() ?? 'N/A',
-  //               DateTime.now(), 'login')
-  //           .toMapWithType(),
-  //     ),
-  //     headers: {'Content-Type': 'application/json'},
-  //   );
-  // }
+  Future<void> saveloginLog({String? admin, String? user, String? type}) async {
+    await http.post(
+      Uri.parse('$firestoreURL/logs'),
+      body: json.encode(
+        logEvent(
+          user: user ?? 'N/A',
+          admin: admin ?? 'N/A',
+          type: type ?? 'N/A',
+          time: DateTime.now(),
+        ).toMapWithType(),
+      ),
+      headers: {'Content-Type': 'application/json'},
+    );
+  }
 
   Future<List<Customer>> getAllCustomersFromFirestore() async {
     try {
