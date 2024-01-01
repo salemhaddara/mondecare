@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, camel_case_types, must_be_immutable
+// ignore_for_file: library_private_types_in_public_api, camel_case_types, must_be_immutable, file_names
 
 import 'package:flutter/material.dart';
 
@@ -12,7 +12,7 @@ class questionsdropDownMenu extends StatefulWidget {
 
 class _questionsdropDownMenuState extends State<questionsdropDownMenu> {
   String _selectedItem = 'What is the name of your BestFriend ?';
-  // List of items for the dropdown menu
+
   final List<String> _dropdownItems = [
     'What is the name of your BestFriend ?',
     'What is your favorite color ?',

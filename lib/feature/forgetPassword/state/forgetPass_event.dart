@@ -10,3 +10,5 @@ class updatePass extends forgetPass_event {
       required this.answer,
       required this.username});
 }
+
+class returnInitial extends forgetPass_event {}

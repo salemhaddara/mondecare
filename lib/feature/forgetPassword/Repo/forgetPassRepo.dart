@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:mondecare/config/Models/MyUser.dart';
 import 'package:mondecare/core/utils/Backend/Backend.dart';
@@ -45,15 +46,19 @@ class forgetPassRepo {
       String question, answer, newPass, username) async {
     try {
       Map<String, dynamic>? userData = await getUserByUserName(username);
+
       if (userData != null) {
         MyUser user = userData['user'] as MyUser;
         String documentName = userData['documentName'] as String;
-
         if (user.question == question && user.questionAnswer == answer) {
-          final Map<String, String> updatedData = {'password': newPass};
-
-          final updateResponse = await http.put(
-            Uri.parse('$firestoreURL/users/$documentName'),
+          final Map<String, dynamic> updatedData = {
+            'password': {
+              'stringValue': md5.convert(utf8.encode(newPass)).toString()
+            }
+          };
+          final updateResponse = await http.patch(
+            Uri.parse(
+                '$domainName$documentName?updateMask.fieldPaths=password'),
             body: json.encode({'fields': updatedData}),
             headers: {
               'Content-Type': 'application/json',

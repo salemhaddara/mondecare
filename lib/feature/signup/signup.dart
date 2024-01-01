@@ -37,7 +37,7 @@ class _signupState extends State<signup> {
       lastName = '',
       passwordcheck = '',
       countrycheck = 'Egypt',
-      questioncheck = '',
+      questioncheck = 'What is the name of your BestFriend ?',
       answercheck = '';
   @override
   Widget build(BuildContext context) {

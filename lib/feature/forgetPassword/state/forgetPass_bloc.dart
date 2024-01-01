@@ -25,5 +25,10 @@ class forgetPass_bloc extends Bloc<forgetPass_event, forgetPass_state> {
         }
       },
     );
+    on<returnInitial>(
+      (event, emit) {
+        emit(forgetPass_state(initialStateTracker()));
+      },
+    );
   }
 }

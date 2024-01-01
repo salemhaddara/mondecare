@@ -7,11 +7,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:mondecare/config/theme/colors.dart';
+import 'package:mondecare/config/theme/widgets/Snackbar.dart';
 import 'package:mondecare/config/theme/widgets/inputfield.dart';
 import 'package:mondecare/config/theme/widgets/text400normal.dart';
 import 'package:mondecare/feature/forgetPassword/Repo/forgetPassRepo.dart';
 import 'package:mondecare/feature/forgetPassword/state/forgetPass_bloc.dart';
+import 'package:mondecare/feature/forgetPassword/state/forgetPass_event.dart';
 import 'package:mondecare/feature/forgetPassword/state/forgetPass_state.dart';
+import 'package:mondecare/feature/forgetPassword/tracker/forgetPassTracker.dart';
+import 'package:mondecare/feature/login/login.dart';
 import 'package:mondecare/feature/signup/signupcomponents/dropDown.dart';
 
 class forgetPasswordScreen extends StatefulWidget {
@@ -96,8 +100,6 @@ class _forgetPasswordScreenState extends State<forgetPasswordScreen> {
                               children: [
                                 _forgetPass(size),
                                 _form(size),
-
-                                // _signinButton(size, context),
                               ],
                             ),
                           ),
@@ -122,19 +124,22 @@ class _forgetPasswordScreenState extends State<forgetPasswordScreen> {
     );
   }
 
-  Widget _form(Size size) {
+  _form(Size size) {
     return Form(
       key: formKey,
       child: Column(
         children: [
-          _Title(size, 'UserName'),
+          _title(size, 'UserName'),
           _userNameField(size),
-          _Title(size, 'New Password'),
+          _title(size, 'New Password'),
           _passwordField(size),
-          _Title(size, 'Question'),
-          questionsdropDownMenu(onChanged: (question) {}),
-          _Title(size, 'Answer'),
+          _title(size, 'Question'),
+          questionsdropDownMenu(onChanged: (question) {
+            questionCheck = question;
+          }),
+          _title(size, 'Answer'),
           _answer(size),
+          _resetPassButton(size, context)
         ],
       ),
     );
@@ -154,7 +159,7 @@ class _forgetPasswordScreenState extends State<forgetPasswordScreen> {
         ));
   }
 
-  Widget _Title(Size size, String title) {
+  _title(Size size, String title) {
     return Container(
       width: size.width,
       margin: const EdgeInsets.only(top: 26, bottom: 10),
@@ -186,7 +191,9 @@ class _forgetPasswordScreenState extends State<forgetPasswordScreen> {
             return null;
           },
           initialState: false,
-          onChanged: (text) {},
+          onChanged: (text) {
+            usernameCheck = text ?? '';
+          },
         );
       },
     );
@@ -210,13 +217,15 @@ class _forgetPasswordScreenState extends State<forgetPasswordScreen> {
             return null;
           },
           initialState: false,
-          onChanged: (text) {},
+          onChanged: (text) {
+            answerCheck = text ?? '';
+          },
         );
       },
     );
   }
 
-  Widget _passwordField(Size size) {
+  _passwordField(Size size) {
     return BlocBuilder<forgetPass_bloc, forgetPass_state>(
       builder: (context, state) {
         return InputField(
@@ -233,71 +242,81 @@ class _forgetPasswordScreenState extends State<forgetPasswordScreen> {
             return null;
           },
           initialState: true,
-          onChanged: (text) {},
+          onChanged: (text) {
+            newPass = text ?? '';
+          },
         );
       },
     );
   }
 
-  // _signinButton(Size size, BuildContext pagecontext) {
-  //   bool Navigated = false;
-  //   bool isError = false;
-  //   return BlocBuilder<loginbloc, loginstate>(builder: (context, state) {
-  //     if (state.formstatus is submissionsuccess && !Navigated) {
-  //       WidgetsBinding.instance.addPostFrameCallback((_) {
-  //         Navigator.of(pagecontext).pushReplacementNamed(homescreenRoute);
-  //       });
-  //       Navigated = true;
-  //       return Container();
-  //     }
-  //     if (state.formstatus is submissionfailed && !isError) {
-  //       WidgetsBinding.instance.addPostFrameCallback((_) async {
-  //         ScaffoldMessenger.of(pagecontext).showSnackBar(showSnackbar(
-  //             (state.formstatus as submissionfailed).exception.toString(),
-  //             size));
-  //         context.read<loginbloc>().add(returnInitialStatus());
-  //       });
-  //       isError = true;
-  //       return Container();
-  //     }
-  //     return state.formstatus is formsubmitting
-  //         ? Container(
-  //             margin: const EdgeInsets.only(top: 26),
-  //             child: CircularProgressIndicator(
-  //               color: darkgrey,
-  //               strokeWidth: 6,
-  //             ),
-  //           )
-  //         : Container(
-  //             margin: const EdgeInsets.only(top: 26),
-  //             child: GestureDetector(
-  //               onTap: () {
-  //                 if (emailcheck.isNotEmpty && passwordcheck.isNotEmpty) {
-  //                   if (formKey.currentState!.validate()) {
-  //                     context
-  //                         .read<loginbloc>()
-  //                         .add((loginSubmitted(emailcheck, passwordcheck)));
-  //                   }
-  //                 }
-  //               },
-  //               child: Container(
-  //                 height: size.height * 0.06,
-  //                 width: size.width / 1.5,
-  //                 constraints: const BoxConstraints(maxWidth: 600),
-  //                 decoration: BoxDecoration(
-  //                     borderRadius: const BorderRadius.all(
-  //                       Radius.circular(14),
-  //                     ),
-  //                     color: darkgrey),
-  //                 alignment: Alignment.center,
-  //                 child: text400normal(
-  //                   data: 'Sign In',
-  //                   fontsize: size.height * 0.02,
-  //                   textColor: motard,
-  //                 ),
-  //               ),
-  //             ),
-  //           );
-  //   });
-  // }
+  _resetPassButton(Size size, BuildContext pagecontext) {
+    bool navigated = false;
+    bool isError = false;
+    return BlocBuilder<forgetPass_bloc, forgetPass_state>(
+        builder: (context, state) {
+      if (state.tracker is successstateTracker && !navigated) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.of(pagecontext).pushReplacement(
+              MaterialPageRoute(builder: (context) => const login()));
+        });
+        navigated = true;
+        return Container();
+      }
+      if (state.tracker is failedStateTracker && !isError) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          ScaffoldMessenger.of(pagecontext).showSnackBar(showSnackbar(
+              (state.tracker as failedStateTracker).exception.toString(),
+              size));
+          context.read<forgetPass_bloc>().add(returnInitial());
+        });
+        isError = true;
+        return Container();
+      }
+      return state.tracker is loadingStateTracker
+          ? Container(
+              margin: const EdgeInsets.only(top: 26),
+              child: CircularProgressIndicator(
+                color: darkgrey,
+                strokeWidth: 6,
+              ),
+            )
+          : Container(
+              margin: const EdgeInsets.only(top: 26),
+              child: GestureDetector(
+                onTap: () {
+                  if (usernameCheck.isNotEmpty &&
+                      newPass.isNotEmpty &&
+                      answerCheck.isNotEmpty &&
+                      questionCheck.isNotEmpty) {
+                    if (formKey.currentState!.validate()) {
+                      context.read<forgetPass_bloc>().add((updatePass(
+                            username: usernameCheck,
+                            newPass: newPass,
+                            answer: answerCheck,
+                            question: questionCheck,
+                          )));
+                    }
+                  }
+                },
+                child: Container(
+                  height: size.height * 0.06,
+                  width: size.width / 1.5,
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(14),
+                      ),
+                      color: darkgrey),
+                  alignment: Alignment.center,
+                  child: text400normal(
+                    data: 'Sign In',
+                    fontsize: size.height * 0.02,
+                    textColor: motard,
+                  ),
+                ),
+              ),
+            );
+    });
+  }
 }
