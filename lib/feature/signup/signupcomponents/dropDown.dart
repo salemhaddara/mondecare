@@ -27,8 +27,8 @@ class _questionsdropDownMenuState extends State<questionsdropDownMenu> {
       constraints: const BoxConstraints(maxWidth: 600),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        border: Border.all(), // Add border for better visibility
-        borderRadius: BorderRadius.circular(8.0), // Optional: Add border radius
+        border: Border.all(),
+        borderRadius: BorderRadius.circular(8.0),
       ),
       child: DropdownButton<String>(
         value: _selectedItem,

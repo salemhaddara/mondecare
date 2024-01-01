@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names, camel_case_types
+// ignore_for_file: camel_case_types, file_names
 
 import 'dart:ui';
 
@@ -6,29 +6,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:mondecare/authrepository.dart';
 import 'package:mondecare/config/theme/colors.dart';
-import 'package:mondecare/config/theme/widgets/Snackbar.dart';
 import 'package:mondecare/config/theme/widgets/inputfield.dart';
 import 'package:mondecare/config/theme/widgets/text400normal.dart';
-import 'package:mondecare/core/routes/routes.dart';
-import 'package:mondecare/feature/forgetPassword/forgetPasswordScreen.dart';
-import 'package:mondecare/feature/login/loginComponents/signuprichtext.dart';
-import 'package:mondecare/feature/login/loginstates/loginbloc.dart';
-import 'package:mondecare/feature/login/loginstates/loginevent.dart';
-import 'package:mondecare/feature/login/loginstates/loginstate.dart';
-import 'package:mondecare/feature/login/submission/submissionevent.dart';
+import 'package:mondecare/feature/forgetPassword/Repo/forgetPassRepo.dart';
+import 'package:mondecare/feature/forgetPassword/state/forgetPass_bloc.dart';
+import 'package:mondecare/feature/forgetPassword/state/forgetPass_state.dart';
+import 'package:mondecare/feature/signup/signupcomponents/dropDown.dart';
 
-class login extends StatefulWidget {
-  const login({super.key});
+class forgetPasswordScreen extends StatefulWidget {
+  const forgetPasswordScreen({super.key});
 
   @override
-  State<login> createState() => _loginState();
+  State<forgetPasswordScreen> createState() => _forgetPasswordScreenState();
 }
 
-class _loginState extends State<login> {
+class _forgetPasswordScreenState extends State<forgetPasswordScreen> {
   final formKey = GlobalKey<FormState>();
-  String emailcheck = '', passwordcheck = '';
+  String usernameCheck = '',
+      newPassCheck = '',
+      newPass = '',
+      questionCheck = 'What is the name of your BestFriend ?',
+      answerCheck = '';
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +41,7 @@ class _loginState extends State<login> {
       resizeToAvoidBottomInset: false,
       backgroundColor: white,
       body: BlocProvider(
-        create: (context) => loginbloc(context.read<AuthRepository>()),
+        create: (context) => forgetPass_bloc(context.read<forgetPassRepo>()),
         child: Directionality(
           textDirection: TextDirection.ltr,
           child: Stack(
@@ -95,11 +94,10 @@ class _loginState extends State<login> {
                             padding: const EdgeInsets.all(16),
                             child: Column(
                               children: [
-                                _SignInTitle(size),
+                                _forgetPass(size),
                                 _form(size),
-                                _forgetPassword(size),
-                                _signinButton(size, context),
-                                _donthaveaccount(size)
+
+                                // _signinButton(size, context),
                               ],
                             ),
                           ),
@@ -129,36 +127,40 @@ class _loginState extends State<login> {
       key: formKey,
       child: Column(
         children: [
-          _emailTitle(size),
-          _emailField(size),
-          _passwordTitle(size),
+          _Title(size, 'UserName'),
+          _userNameField(size),
+          _Title(size, 'New Password'),
           _passwordField(size),
+          _Title(size, 'Question'),
+          questionsdropDownMenu(onChanged: (question) {}),
+          _Title(size, 'Answer'),
+          _answer(size),
         ],
       ),
     );
   }
 
-  Widget _SignInTitle(Size size) {
+  _forgetPass(Size size) {
     return Container(
         width: size.width,
         height: 50,
         alignment: Alignment.center,
         margin: const EdgeInsets.all(10),
         child: text400normal(
-          data: 'Sign In',
+          data: 'Forget Password',
           fontsize: size.height * 0.035,
           fontWeight: FontWeight.w600,
           textColor: darkgrey,
         ));
   }
 
-  Widget _emailTitle(Size size) {
+  Widget _Title(Size size, String title) {
     return Container(
       width: size.width,
       margin: const EdgeInsets.only(top: 26, bottom: 10),
       constraints: const BoxConstraints(maxWidth: 600),
       child: text400normal(
-        data: 'UserName',
+        data: title,
         textColor: darkgrey,
         fontsize: size.height * 0.017,
         align: TextAlign.start,
@@ -166,27 +168,8 @@ class _loginState extends State<login> {
     );
   }
 
-  Widget _forgetPassword(Size size) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => const forgetPasswordScreen()));
-      },
-      child: Container(
-        width: size.width,
-        constraints: const BoxConstraints(maxWidth: 600),
-        child: text400normal(
-          data: 'Forget Password',
-          textColor: darkgrey,
-          fontsize: size.height * 0.017,
-          align: TextAlign.end,
-        ),
-      ),
-    );
-  }
-
-  Widget _emailField(Size size) {
-    return BlocBuilder<loginbloc, loginstate>(
+  _userNameField(Size size) {
+    return BlocBuilder<forgetPass_bloc, forgetPass_state>(
       builder: (context, state) {
         return InputField(
           hint: '',
@@ -203,29 +186,38 @@ class _loginState extends State<login> {
             return null;
           },
           initialState: false,
-          onChanged: (text) {
-            emailcheck = text!;
-          },
+          onChanged: (text) {},
         );
       },
     );
   }
 
-  Widget _passwordTitle(Size size) {
-    return Container(
-      width: size.width,
-      constraints: const BoxConstraints(maxWidth: 600),
-      margin: const EdgeInsets.only(top: 10, bottom: 10),
-      child: text400normal(
-        data: 'Password',
-        textColor: darkgrey,
-        fontsize: size.height * 0.017,
-      ),
+  _answer(Size size) {
+    return BlocBuilder<forgetPass_bloc, forgetPass_state>(
+      builder: (context, state) {
+        return InputField(
+          hint: '',
+          isPassword: false,
+          icon: Icons.question_answer,
+          validator: (answer) {
+            if (answer!.isEmpty) {
+              return null;
+            }
+            if (answer.isNotEmpty && answer.length < 3) {
+              return 'Answer Must be more than 3 characters';
+            }
+
+            return null;
+          },
+          initialState: false,
+          onChanged: (text) {},
+        );
+      },
     );
   }
 
   Widget _passwordField(Size size) {
-    return BlocBuilder<loginbloc, loginstate>(
+    return BlocBuilder<forgetPass_bloc, forgetPass_state>(
       builder: (context, state) {
         return InputField(
           hint: '',
@@ -241,86 +233,71 @@ class _loginState extends State<login> {
             return null;
           },
           initialState: true,
-          onChanged: (text) {
-            passwordcheck = text!;
-          },
+          onChanged: (text) {},
         );
       },
     );
   }
 
-  _signinButton(Size size, BuildContext pagecontext) {
-    bool Navigated = false;
-    bool isError = false;
-    return BlocBuilder<loginbloc, loginstate>(builder: (context, state) {
-      if (state.formstatus is submissionsuccess && !Navigated) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          Navigator.of(pagecontext).pushReplacementNamed(homescreenRoute);
-        });
-        Navigated = true;
-        return Container();
-      }
-      if (state.formstatus is submissionfailed && !isError) {
-        WidgetsBinding.instance.addPostFrameCallback((_) async {
-          ScaffoldMessenger.of(pagecontext).showSnackBar(showSnackbar(
-              (state.formstatus as submissionfailed).exception.toString(),
-              size));
-          context.read<loginbloc>().add(returnInitialStatus());
-        });
-        isError = true;
-        return Container();
-      }
-      return state.formstatus is formsubmitting
-          ? Container(
-              margin: const EdgeInsets.only(top: 26),
-              child: CircularProgressIndicator(
-                color: darkgrey,
-                strokeWidth: 6,
-              ),
-            )
-          : Container(
-              margin: const EdgeInsets.only(top: 26),
-              child: GestureDetector(
-                onTap: () {
-                  if (emailcheck.isNotEmpty && passwordcheck.isNotEmpty) {
-                    if (formKey.currentState!.validate()) {
-                      context
-                          .read<loginbloc>()
-                          .add((loginSubmitted(emailcheck, passwordcheck)));
-                    }
-                  }
-                },
-                child: Container(
-                  height: size.height * 0.06,
-                  width: size.width / 1.5,
-                  constraints: const BoxConstraints(maxWidth: 600),
-                  decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(14),
-                      ),
-                      color: darkgrey),
-                  alignment: Alignment.center,
-                  child: text400normal(
-                    data: 'Sign In',
-                    fontsize: size.height * 0.02,
-                    textColor: motard,
-                  ),
-                ),
-              ),
-            );
-    });
-  }
-
-  Widget _donthaveaccount(Size size) {
-    return Container(
-      margin: const EdgeInsets.only(top: 20),
-      child: signuprichtext(
-          startText: 'Dont Have An Account ?',
-          clickableText: ' Sign Up',
-          fontsize: size.height * 0.018,
-          onClick: () {
-            Navigator.pushNamed(context, SignUpscreenRoute);
-          }),
-    );
-  }
+  // _signinButton(Size size, BuildContext pagecontext) {
+  //   bool Navigated = false;
+  //   bool isError = false;
+  //   return BlocBuilder<loginbloc, loginstate>(builder: (context, state) {
+  //     if (state.formstatus is submissionsuccess && !Navigated) {
+  //       WidgetsBinding.instance.addPostFrameCallback((_) {
+  //         Navigator.of(pagecontext).pushReplacementNamed(homescreenRoute);
+  //       });
+  //       Navigated = true;
+  //       return Container();
+  //     }
+  //     if (state.formstatus is submissionfailed && !isError) {
+  //       WidgetsBinding.instance.addPostFrameCallback((_) async {
+  //         ScaffoldMessenger.of(pagecontext).showSnackBar(showSnackbar(
+  //             (state.formstatus as submissionfailed).exception.toString(),
+  //             size));
+  //         context.read<loginbloc>().add(returnInitialStatus());
+  //       });
+  //       isError = true;
+  //       return Container();
+  //     }
+  //     return state.formstatus is formsubmitting
+  //         ? Container(
+  //             margin: const EdgeInsets.only(top: 26),
+  //             child: CircularProgressIndicator(
+  //               color: darkgrey,
+  //               strokeWidth: 6,
+  //             ),
+  //           )
+  //         : Container(
+  //             margin: const EdgeInsets.only(top: 26),
+  //             child: GestureDetector(
+  //               onTap: () {
+  //                 if (emailcheck.isNotEmpty && passwordcheck.isNotEmpty) {
+  //                   if (formKey.currentState!.validate()) {
+  //                     context
+  //                         .read<loginbloc>()
+  //                         .add((loginSubmitted(emailcheck, passwordcheck)));
+  //                   }
+  //                 }
+  //               },
+  //               child: Container(
+  //                 height: size.height * 0.06,
+  //                 width: size.width / 1.5,
+  //                 constraints: const BoxConstraints(maxWidth: 600),
+  //                 decoration: BoxDecoration(
+  //                     borderRadius: const BorderRadius.all(
+  //                       Radius.circular(14),
+  //                     ),
+  //                     color: darkgrey),
+  //                 alignment: Alignment.center,
+  //                 child: text400normal(
+  //                   data: 'Sign In',
+  //                   fontsize: size.height * 0.02,
+  //                   textColor: motard,
+  //                 ),
+  //               ),
+  //             ),
+  //           );
+  //   });
+  // }
 }

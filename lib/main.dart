@@ -6,6 +6,7 @@ import 'package:mondecare/feature/addUser/addUserScreen.dart';
 import 'package:mondecare/feature/admins/AllUsersScreen.dart';
 import 'package:mondecare/feature/deleteUser/deleteUserScreen.dart';
 import 'package:mondecare/feature/deleteUser/deletebloc/Repository/deleteRepository.dart';
+import 'package:mondecare/feature/forgetPassword/Repo/forgetPassRepo.dart';
 import 'package:mondecare/feature/home/home.dart';
 import 'package:mondecare/feature/login/login.dart';
 import 'package:mondecare/feature/logs/logsScreen.dart';
@@ -34,6 +35,9 @@ Future<void> main() async {
       ),
       RepositoryProvider(
         create: ((context) => deleteRepository()),
+      ),
+      RepositoryProvider(
+        create: ((context) => forgetPassRepo()),
       ),
     ],
     child: MaterialApp(
